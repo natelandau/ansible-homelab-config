@@ -1,0 +1,16 @@
+# Ignore MacOS Junk
+.DS_Store
+
+# Ignore synology junk
+*@eaDir*
+
+# Don't push customized information, Galaxy roles, or collections
+galaxy-roles
+ansible_collections
+
+# Don't sync vault password file
+password_file
+.password_file
+
+# Ignore caches
+.cache

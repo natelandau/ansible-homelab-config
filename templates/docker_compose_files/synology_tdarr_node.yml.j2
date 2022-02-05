@@ -1,0 +1,29 @@
+---
+version: '3.9'
+
+services:
+  tdarr_node:
+    image: haveagitgat/tdarr_node:latest
+    hostname: tdarr_node
+    container_name: tdarr_node
+    network_mode: "bridge"
+    environment:
+      - "nodeID={{ inventory_hostname }}"
+      - "nodeIP={{ ansible_host }}"
+      - "nodePort={{ tdarr_node_port }}"
+      - "serverIP={% for h in groups['lan'] if hostvars[h].is_tdarr_server == true %}{{ hostvars[h].ansible_host }}{% endfor %}"
+      - "serverPort={{ tdarr_server_port }}"
+      - "TZ=America/New_York"
+      - "PGID=101"
+      - "PUID={{ ansible_user_uid }}"
+    volumes:
+      - /volume1/docker/tdarr_node:/app/configs
+      - /volume1/media/media/movies:/movies
+      - /volume1/media/tdarr_tmp:/tdarr_tmp
+      - /volume1/media/tdarr_complete:/tdarr_complete
+    ports:
+      - {{ tdarr_node_port }}:{{ tdarr_node_port }}
+    devices:
+      - /dev/dri:/dev/dri
+    privileged: true
+    restart: unless-stopped

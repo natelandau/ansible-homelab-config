@@ -1,0 +1,15 @@
+[[inputs.statsd]]
+  protocol = "udp"                    # Protocol, must be "tcp", "udp4", "udp6" or "udp" (default=udp)
+  service_address = "127.0.0.1:8125"  # Address and port to host UDP listener on
+  delete_gauges = true                # Reset gauges every interval (default=true)
+  delete_counters = true              # Reset counters every interval (default=true)
+  delete_sets = true                  # Reset sets every interval (default=true)
+  delete_timings = true               # Reset timings & histograms every interval (default=true)
+  percentiles = [90.0]                # Percentiles to calculate for timing & histogram stats
+  metric_separator = "_"
+  datadog_extensions = true           # Parses tags in the datadog statsd format
+  allowed_pending_messages = 10000
+  percentile_limit = 1000
+  [inputs.statsd.tagdrop]
+    task = [ "await-*","run-*","await_*","run_*","create_*","create-*" ]
+    task_group = [ "await-*","run-*","await_*","run_*","create_*","create-*" ]

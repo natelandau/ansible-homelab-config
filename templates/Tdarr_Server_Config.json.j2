@@ -1,0 +1,13 @@
+{
+  "serverPort": "{{ tdarr_server_port }}",
+  "webUIPort": "{{ tdarr_webui_port }}",
+  "serverIP": "{% for h in groups['lan'] if hostvars[h].is_tdarr_server == true %}{{ hostvars[h].ansible_host }}{% endfor %}",
+{% if ansible_os_family == 'Darwin' and ansible_architecture == 'arm64' -%}
+  "handbrakePath": "/opt/homebrew/bin/HandBrakeCLI",
+  "ffmpegPath": "/opt/homebrew/bin/ffmpeg",
+{% else %}
+  "handbrakePath": "/usr/local/bin/HandBrakeCLI",
+  "ffmpegPath": "/usr/local/bin/ffmpeg"
+{%- endif %}
+
+}

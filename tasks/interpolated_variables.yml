@@ -1,0 +1,53 @@
+---
+# TASK DESCRIPTION:
+# Creates variables based on other variables and Ansible facts
+#
+# Variables created:
+#   - interpolated_localfs_service_storage: [dir]
+#   - interpolated_consul_configuration_dir: [dir]
+
+- name: "Set local filesystem location (pis)"
+  ansible.builtin.set_fact:
+    interpolated_localfs_service_storage: "{{ rpi_localfs_service_storage }}"
+  changed_when: false
+  when:
+    - "'pis' in group_names"
+
+- name: "Set local filesystem location (macs)"
+  ansible.builtin.set_fact:
+    interpolated_localfs_service_storage: "{{ mac_localfs_service_storage }}"
+  changed_when: false
+  when:
+    - "'macs' in group_names"
+
+- name: "Set NFS mount location (pis)"
+  ansible.builtin.set_fact:
+    interpolated_nfs_service_storage: "{{ rpi_nfs_mount_point }}"
+  changed_when: false
+  when:
+    - "'pis' in group_names"
+
+- name: "Set NFS mount location location (macs)"
+  ansible.builtin.set_fact:
+    interpolated_nfs_service_storage: "{{ mac_storage_mount_point }}"
+  changed_when: false
+  when:
+    - "'macs' in group_names"
+
+- name: "set consul configuration directory (synology)"
+  ansible.builtin.set_fact:
+    interpolated_consul_configuration_dir: "{{ synology_consul_configuration_dir }}"
+  when:
+    - inventory_hostname == 'synology'
+
+- name: "set consul configuration directory (pis)"
+  ansible.builtin.set_fact:
+    interpolated_consul_configuration_dir: "{{ rpi_consul_configuration_dir }}"
+  when:
+    - "'pis' in group_names"
+
+- name: "set consul configuration directory (macs)"
+  ansible.builtin.set_fact:
+    interpolated_consul_configuration_dir: "{{ mac_consul_configuration_dir }}"
+  when:
+    - "'macs' in group_names"

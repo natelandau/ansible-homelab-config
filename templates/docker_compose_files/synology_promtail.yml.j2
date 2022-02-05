@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  promtail:
+    image: grafana/promtail
+    hostname: promtail
+    container_name: promtail
+    ports:
+      - 9080:9080
+    network_mode: "bridge"
+    volumes:
+      - /volume1/docker/promtail/config.yml:/etc/promtail/config.yml
+      - /var/log:/var/log:ro
+    restart: unless-stopped

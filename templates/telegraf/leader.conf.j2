@@ -1,0 +1,22 @@
+[[processors.regex]]
+  namepass = ["consul_health_checks"]
+
+  # Tag and field conversions defined in a separate sub-tables
+  [[processors.regex.tags]]
+    ## Tag to change
+    key = "check_name"
+    ## Regular expression to match on a tag value
+    pattern = "^service: \\W(\\w+)\\W check$"
+    ## Matches of the pattern will be replaced with this string.  Use ${1}
+    ## notation to use the text of the first submatch.
+    replacement = "${1}"
+
+[[inputs.consul]]
+  address = "consul.service.consul:8500"
+  scheme = "http"
+  insecure_skip_verify = true
+  metric_version = 2
+  namedrop = ["traefik.http*","traefik.enable*","traefik.tcp*"]
+  tagexclude = ["traefik.http*","traefik.enable*", "traefik.tcp*"]
+  [inputs.consul.tagdrop]
+    check_name = [ "Nomad Client*", "Nomad Server*", "Serf Health Status" ]

@@ -1,0 +1,13 @@
+version: '3.9'
+
+services:
+  consul:
+    image: consul:latest
+    hostname: consul
+    container_name: consul
+    network_mode: "host"
+    volumes:
+      - /volume1/docker/consul/data:/consul/data
+      - /volume1/docker/consul/config:/consul/config
+    command: consul agent -config-dir=/consul/config
+    restart: unless-stopped

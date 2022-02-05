@@ -1,0 +1,76 @@
+---
+# TASK DESCRIPTION:
+# Keeps Nomad jobs and docker-compose-files in sync.  All job and docker-compose files are written as Jinja2 templates.  Performs the following:
+#
+# - Syncs Nomad jobs
+# - Syncs docker-compose files
+# - Ensures we have directories on the local filesystem for jobs which can't function with networked
+#   storage. (I'm looking at you, 'arr' apps).  These folders must be created, even if empty, to
+#   allow mounting nomad local storage end-points
+
+- name: "Sync Nomad Jobs"
+  block:
+    - name: Remove nomad jobs directory
+      ansible.builtin.file:
+        path: "{{ nomad_jobfile_location }}"
+        state: absent
+      when:
+        - is_nomad_client or is_nomad_server or ("'macs' in group_names")
+        - clean_nomad_jobs
+
+    - name: (Re)Create nomad jobs directory
+      ansible.builtin.file:
+        path: "{{ nomad_jobfile_location }}"
+        state: directory
+        mode: 0755
+      when:
+        - is_nomad_client or is_nomad_server or ("'macs' in group_names")
+        - "'nas' not in group_names"
+
+    - name: synchronize nomad job templates (jinja)
+      ansible.builtin.template:
+        src: "{{ item }}"
+        dest: "{{ nomad_jobfile_location }}/{{ item | basename | regex_replace('.j2$', '') }}"
+        mode: 0644
+      with_fileglob: "templates/nomad_jobs/*.j2"
+      when:
+        - is_nomad_client or is_nomad_server or ("'macs' in group_names")
+        - "'nas' not in group_names"
+
+    - name: synchronize nomad job templates (hcl)
+      ansible.builtin.template:
+        src: "{{ item }}"
+        dest: "{{ nomad_jobfile_location }}/{{ item | basename }}"
+        mode: 0644
+      with_fileglob: "templates/nomad_jobs/*.hcl"
+      when:
+        - is_nomad_client or is_nomad_server or ("'macs' in group_names")
+        - "'nas' not in group_names"
+
+    - name: Ensure we have local storage folders
+      become: true
+      ansible.builtin.file:
+        path: "{{ interpolated_localfs_service_storage }}/{{ item }}"
+        state: directory
+        mode: 0777
+        group: "{{ ansible_user_gid }}"
+        owner: "{{ ansible_user_uid }}"
+      when:
+        - is_nomad_client or is_nomad_server
+      loop: "{{ service_localfs_dirs }}"
+
+- name: "Sync docker compose files"
+  when: is_docker_compose_client
+  block:
+    - name: confirm compose file dir exists
+      ansible.builtin.file:
+        path: "{{ docker_compose_file_location }}"
+        state: directory
+        mode: 0755
+
+    - name: synchronize docker-compose files
+      ansible.builtin.template:
+        src: "{{ item }}"
+        dest: "{{ docker_compose_file_location }}/{{ item | basename | regex_replace('.j2$', '') }}"
+        mode: 0644
+      with_fileglob: "../templates/docker_compose_files/*.j2"

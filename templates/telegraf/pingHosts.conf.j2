@@ -1,0 +1,88 @@
+{# Ping internal servers #}
+[[processors.enum]]
+  [[processors.enum.mapping]]
+    ## Name of the field to map
+    #field = "url"
+
+    ## Name of the tag to map
+    tag = "url"
+
+    ## Destination tag or field to be used for the mapped value.  By default the
+    ## source tag or field is used, overwriting the original value.
+    dest = "host"
+
+    ## Default value to be used for all values not contained in the mapping
+    ## table.  When unset and no match is found, the original field will remain
+    ## unmodified and the destination tag or field will not be created.
+    # default = 0
+
+    ## Table of mappings
+    [processors.enum.mapping.value_mappings]
+          "10.0.30.6" = "synology"
+    {% for i in groups['pis'] %}
+      "{{ hostvars[i].ansible_host }}" = "{{ hostvars[i].inventory_hostname }}"
+    {% endfor %}
+
+[[inputs.ping]]
+  ## Hosts to send ping packets to.
+  # https://github.com/influxdata/telegraf/blob/release-1.13/plugins/inputs/ping/README.md
+  urls = [{% for i in groups['pis'] %}'{{ hostvars[i].ansible_host }}'{% if not loop.last %}, {% endif %}{% endfor %},
+    '10.0.30.6',
+    'core1.bos1.he.net',
+    'core1.lax1.he.net',
+    'core1.nyc4.he.net',
+    'core1.oma1.he.net',
+    'core1.chi1.he.net',
+    'core1.dal1.he.net',
+    'core1.den1.he.net',
+    'core1.mia1.he.net',
+    'core1.bna1.he.net',
+    'core1.phx1.he.net',
+    'core1.sea1.he.net',
+    'core1.blp1.he.net',
+    'core1.ams1.he.net',
+    'core1.dxb1.he.net',
+    'core1.jnb1.he.net',
+    'core1.man1.he.net',
+    'core1.rom1.he.net',
+    'core1.tyo1.he.net',
+    'core1.zrh3.he.net',
+    'core2.sao1.he.net',
+    'core1.sin1.he.net',
+    'core1.kpb1.he.net',
+    'core1.nbo1.he.net',
+    'core1.tpe1.he.net',
+    'core1.sto1.he.net',
+    'core1.ymq1.he.net',
+    'core2.syd1.he.net'
+    ]
+
+  ## Method used for sending pings, can be either "exec" or "native".  When set
+  ## to "exec" the systems ping command will be executed.  When set to "native"
+  ## the plugin will send pings directly.
+  ##
+  ## While the default is "exec" for backwards compatibility, new deployments
+  ## are encouraged to use the "native" method for improved compatibility and
+  ## performance.
+  method = "exec"
+
+  ## Number of ping packets to send per interval.  Corresponds to the "-c"
+  ## option of the ping command.
+  count = 1
+
+  ## Time to wait between sending ping packets in seconds.  Operates like the
+  ## "-i" option of the ping command.
+  ping_interval = 1.0
+
+  fielddrop = ["packets_received", "packets_transmitted", "ttl", "standard_deviation_ms"]
+
+  interval = "1m"  ## Interval to send pings
+
+  ## Specify the ping executable binary.
+  {% if 'pis' in group_names %}
+  binary = "/usr/bin/ping"
+  {% elif 'macs' in group_names %}
+  binary = "/sbin/ping"
+  {% else %}
+  binary = "/bin/ping"
+  {% endif %}

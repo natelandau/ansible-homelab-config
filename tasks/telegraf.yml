@@ -1,0 +1,192 @@
+---
+# TASK DESCRIPTION:
+# Downloads, installs, and configures Telegraf
+
+# --------------------------------- Set variables depending on system type
+- name: "Configure variables"
+  block:
+    - name: "set variable: telegraph_binary_location (Debian)"
+      ansible.builtin.set_fact:
+        telegraph_binary_location: "/usr/bin/telegraf"
+      when:
+        - ansible_os_family == 'Debian'
+
+    - name: "set variable: telegraph_binary_location (MacOS)"
+      ansible.builtin.set_fact:
+        telegraph_binary_location: "/usr/local/bin/telegraf"
+      when:
+        - ansible_os_family == 'Darwin'
+
+    - name: "set fact: telegraph_config_location (Debian)"
+      ansible.builtin.set_fact:
+        telegraph_config_location: "/etc/telegraf"
+      when:
+        - ansible_os_family == 'Debian'
+
+    - name: "set fact: telegraph_config_location (macOS)"
+      ansible.builtin.set_fact:
+        telegraph_config_location: "/usr/local/etc"
+      when:
+        - ansible_os_family == 'Darwin'
+
+    - name: "set fact: telegraph_config_location (macOS)"
+      ansible.builtin.set_fact:
+        telegraph_config_location: "/volume1/docker/telegraf/config"
+      when:
+        - inventory_hostname == 'synology'
+
+    - name: "Fail if arm Mac (need to update task) or variables not defined"
+      ansible.builtin.assert:
+        that:
+          - telegraph_binary_location is defined
+          - telegraph_config_location is defined
+          - not mac_arm
+        fail_msg: "Unable to install Telegraf on this host"
+
+- name: "Install/upgrade Telegraf"
+  block:
+    - name: "set fact: Need telegraf install?"
+      ansible.builtin.set_fact:
+        need_telegraf_install: false
+      when: telegraph_binary_location is defined
+
+    - name: Check if telegraf is installed
+      ansible.builtin.stat:
+        path: "{{ telegraph_binary_location }}"
+      check_mode: false
+      register: telegraf_binary_exists
+      when: telegraph_binary_location is defined
+
+    - name: "set fact: Need telegraf install?"
+      ansible.builtin.set_fact:
+        need_telegraf_install: true
+      check_mode: false
+      when:
+        - telegraph_binary_location is defined
+        - not telegraf_binary_exists.stat.exists
+
+    - name: Check current version of telegraf
+      ansible.builtin.shell: "{{ telegraph_binary_location }} --version | grep -oE '[0-9]+\\.[0-9]+\\.[0-9]+'"
+      ignore_errors: true
+      register: current_telegraf_version
+      check_mode: false
+      changed_when: current_telegraf_version.stdout != telegraf_version
+      when:
+        - telegraph_binary_location is defined
+        - not need_telegraf_install
+
+    - name: "set fact: Need telegraf install?"
+      ansible.builtin.set_fact:
+        need_telegraf_install: true
+      when:
+        - telegraph_binary_location is defined
+        - not need_telegraf_install
+        - current_telegraf_version.stdout != telegraf_version
+
+    - name: install telegraf (MacOS)
+      community.general.homebrew:
+        name: telegraf
+        state: present
+      notify: restart_telegraf
+      when:
+        - ansible_os_family == 'Darwin'
+        - need_telegraf_install
+
+    - name: install base apt-transport (Debian)
+      become: true
+      ansible.builtin.apt:
+        pkg: apt-transport-https
+        state: present
+        update_cache: true
+      when:
+        - ansible_os_family == 'Debian'
+        - need_telegraf_install
+
+    - name: Download telegraf GPG key (Debian)
+      become: true
+      ansible.builtin.apt_key:
+        state: present
+        url: "https://repos.influxdata.com/influxdb.key"
+      when:
+        - ansible_os_family == 'Debian'
+        - need_telegraf_install
+
+    - name: Add telegraf repository to apt (Debian)
+      become: true
+      ansible.builtin.apt_repository:
+        repo: deb https://repos.influxdata.com/debian buster stable
+        state: present
+      when:
+        - ansible_os_family == 'Debian'
+        - need_telegraf_install
+
+    - name: install telegraf (Debian)
+      become: true
+      ansible.builtin.apt:
+        pkg: telegraf
+        update_cache: true
+      notify: restart_telegraf
+      when:
+        - ansible_os_family == 'Debian'
+        - need_telegraf_install
+
+# - name: give telegraf access to docker
+#   become: true
+#   ansible.builtin.user:
+#     name: telegraf
+#     groups: docker
+#     append: true
+#     state: present
+#     create_home: false
+#   when:
+#     - ansible_os_family == 'Debian'
+#     - need_telegraf_install
+
+# -------------------------------------------------- Add Telegraf Configs
+- name: "Configure Telegraf"
+  block:
+    - name: "Ensure {{ telegraph_config_location }} exists"
+      become: true
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: 0755
+      loop:
+        - "{{ telegraph_config_location }}"
+        - "{{ telegraph_config_location }}/telegraf.d"
+
+    - name: template config files to server
+      become: true
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: "644"
+      loop:
+        - { src: "telegraf/base_config.conf.j2", dest: "{{ telegraph_config_location }}/telegraf.conf" }
+        - { src: "telegraf/temperature.conf.j2", dest: "{{ telegraph_config_location }}/telegraf.d/temperature.conf" }
+        - { src: "telegraf/nomad.conf.j2", dest: "{{ telegraph_config_location }}/telegraf.d/nomad.conf" }
+        - { src: "telegraf/docker.conf.j2", dest: "{{ telegraph_config_location }}/telegraf.d/docker.conf" }
+      notify: restart_telegraf
+
+    - name: template leader configs (ie, configs that should be placed on a single server)
+      become: true
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: "644"
+      loop:
+        - { src: "telegraf/leader.conf.j2", dest: "{{ telegraph_config_location }}/telegraf.d/leader.conf" }
+        - { src: "telegraf/pingHosts.conf.j2", dest: "{{ telegraph_config_location }}/telegraf.d/pingHosts.conf" }
+      when:
+        - is_cluster_leader
+      notify: restart_telegraf
+
+    - name: Reset file ownership (macOS)
+      become: true
+      ansible.builtin.file:
+        path: "{{ telegraph_config_location }}"
+        owner: "{{ ansible_user_uid }}"
+        group: "{{ ansible_user_gid }}"
+        recurse: true
+      when:
+        - (ansible_os_family == 'Darwin') or (inventory_hostname == 'synology')

@@ -1,0 +1,67 @@
+{
+    "services": [{
+            "name": "sabnzbd",
+            "id": "sabnzbd",
+            "tags": [
+              "traefik.enable=true",
+              "traefik.http.services.sabnzbd.loadbalancer.server.port=8080",
+              "traefik.http.routers.sabnzbd.rule=Host(`sab.{{ homelab_domain_name }}`)",
+              "traefik.http.routers.sabnzbd.entryPoints=web,websecure",
+              "traefik.http.routers.sabnzbd.service=sabnzbd",
+              "traefik.http.routers.sabnzbd.tls=true",
+              "traefik.http.routers.sabnzbd.tls.certresolver=cloudflare",
+              "traefik.http.routers.sabnzbd.middlewares=authelia@file"
+              ],
+            "checks": [{
+                "id": "sabnzbd-http-check",
+                "http": "http://{{ synology_second_ip }}:8080",
+                "interval": "30s",
+                "timeout": "5s",
+                "success_before_passing": 3,
+                "failures_before_critical": 3
+            }]
+        },
+        {
+            "name": "synology",
+            "id": "synology",
+            "tags": [
+              "traefik.enable=true",
+              "traefik.http.services.synology.loadbalancer.server.port=5000",
+              "traefik.http.routers.synology.rule=Host(`nas.{{ homelab_domain_name }}`)",
+              "traefik.http.routers.synology.entryPoints=web,websecure",
+              "traefik.http.routers.synology.service=synology",
+              "traefik.http.routers.synology.tls=true",
+              "traefik.http.routers.synology.tls.certresolver=cloudflare"
+              ],
+            "checks": [{
+                "id": "synology-http-check",
+                "http": "http://{{ synology_second_ip }}:5000",
+                "interval": "30s",
+                "timeout": "5s",
+                "success_before_passing": 3,
+                "failures_before_critical": 3
+            }]
+        },
+        {
+            "name": "asntoip",
+            "id": "asntoip",
+            "tags": [
+              "traefik.enable=true",
+              "traefik.http.services.asntoip.loadbalancer.server.port=5151",
+              "traefik.http.routers.asntoip.rule=Host(`asntoip.{{ homelab_domain_name }}`)",
+              "traefik.http.routers.asntoip.entryPoints=web,websecure",
+              "traefik.http.routers.asntoip.service=asntoip",
+              "traefik.http.routers.asntoip.tls=true",
+              "traefik.http.routers.asntoip.tls.certresolver=cloudflare"
+              ],
+            "checks": [{
+                "id": "asntoip-http-check",
+                "http": "http://{{ synology_second_ip }}:5151",
+                "interval": "30s",
+                "timeout": "5s",
+                "success_before_passing": 3,
+                "failures_before_critical": 3
+            }]
+        }
+    ]
+}

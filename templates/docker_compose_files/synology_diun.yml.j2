@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  diun:
+    image: ghcr.io/crazy-max/diun
+    hostname: diun
+    container_name: diun
+    network_mode: "bridge"
+    environment:
+      - "TZ=America/New_York"
+      - "DIUN_WATCH_SCHEDULE=26 */48 * * *"
+      - "DIUN_PROVIDERS_DOCKER_WATCHBYDEFAULT=true"
+      - "DIUN_NOTIF_PUSHOVER_TOKEN={{ pushover_token }}"
+      - "DIUN_NOTIF_PUSHOVER_RECIPIENT={{ pushover_recipient }}"
+      - "DIUN_WATCH_FIRSTCHECKNOTIF=false"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped

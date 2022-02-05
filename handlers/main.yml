@@ -1,0 +1,93 @@
+---
+##################################### MOUNT DRIVES
+- name: Mount shared storage on Mac
+  become: true
+  ansible.builtin.command:
+    cmd: automount -cv
+  register: automount_output
+  failed_when: automount_output.rc > 0
+  when:
+    - "'macs' in group_names"
+    - not ansible_check_mode
+  listen: "mac_run_automount"
+
+- name: Mount and unmount shared storage on Mac
+  become: true
+  ansible.builtin.command:
+    cmd: automount -cvu
+  register: automount_output
+  failed_when: automount_output.rc > 0
+  when:
+    - "'macs' in group_names"
+    - not ansible_check_mode
+  listen: "mac_run_automount_unmount"
+
+##################################### TELEGRAF
+- name: (Re)Start telegraf (Debian)
+  become: true
+  ansible.builtin.service:
+    name: telegraf
+    state: restarted
+  when:
+    - ansible_os_family == 'Debian'
+  listen: restart_telegraf
+
+- name: (Re)Start telegraf
+  ansible.builtin.shell:
+    cmd: /usr/local/bin/brew services restart telegraf
+    executable: /usr/local/bin/bash
+  ignore_errors: true
+  when:
+    - ansible_os_family == 'Darwin'
+  listen: restart_telegraf
+
+##################################### NOMAD
+
+- name: restart nomad (Debian)
+  become: true
+  ansible.builtin.systemd:
+    name: nomad
+    enabled: true
+    state: restarted
+  when:
+    - ansible_os_family == 'Debian'
+    - "'nostart' not in ansible_run_tags"
+  listen: "restart nomad"
+
+- name: "unload nomad agent (MacOSX)"
+  ansible.builtin.command:
+    cmd: "launchctl unload -w {{ nomad_plist_macos }}"
+  failed_when: false
+  when:
+    - ansible_os_family == 'Darwin'
+    - "'nostart' not in ansible_run_tags"
+  listen: "restart nomad"
+
+- name: "load the nomad agent (MacOSX)"
+  ansible.builtin.command:
+    cmd: "launchctl load -w {{ nomad_plist_macos }}"
+  when:
+    - ansible_os_family == 'Darwin'
+    - "'nostart' not in ansible_run_tags"
+  listen: "restart nomad"
+
+- name: "ensure nomad is really running"
+  ansible.builtin.shell:
+    cmd: "sleep 10 && /usr/local/bin/nomad node status -self -short | grep {{ inventory_hostname }}"
+  register: node_status_response
+  failed_when: node_status_response.rc > 0
+  changed_when: false
+  when: "'nostart' not in ansible_run_tags"
+  listen: "restart nomad"
+# - name: "Ensure sure Nomad service is really running"
+#   ansible.builtin.command:
+#     cmd: systemctl is-active nomad
+#   register: is_nomad_really_running
+#   changed_when: false
+#   failed_when: is_nomad_really_running.rc != 0
+#   when:
+#     - ansible_os_family == 'Debian'
+#     - "'nostart' not in ansible_run_tags"
+#   listen: "restart nomad"
+
+##################################### CONSUL

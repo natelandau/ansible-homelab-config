@@ -1,0 +1,21 @@
+---
+# Full documentation: https://ansible-lint.readthedocs.io/en/latest/index.html
+exclude_paths:
+  - .cache/
+  - .github/
+  - ../../.cache/
+  - archived_data/
+
+skip_list:
+  - unnamed-task
+  - var-naming
+  - command-instead-of-shell
+  - meta-no-info
+  - meta-incorrect
+  - role-name
+  - ignore-errors
+
+warn_list:
+  - experimental
+  - risky-file-permissions
+  - command-instead-of-module

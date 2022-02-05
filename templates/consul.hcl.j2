@@ -1,0 +1,128 @@
+# ----------------------------------------- General Info
+"datacenter" = "{{ datacenter_name }}"  # NOTE: changing the datacenter requires generating new certificates
+"node_name"  = "{{ inventory_hostname }}"
+"domain"     = "consul"
+{% if is_consul_server %}
+"server"    = true
+"ui_config" = {
+  "enabled" = true
+}
+{% else %}
+"ui_config" = {
+  "enabled" = false
+}
+{% endif %}
+
+# ----------------------------------------- Files and Logs
+{% if 'synology' in inventory_hostname %}
+"data_dir" = "/consul/data"
+"log_file" = "/consul/data/logs/consul.log"
+{% else %}
+"data_dir" = "{{ consul_opt_dir }}"
+"log_file" = "{{ consul_opt_dir }}/logs/consul.log"
+{% endif %}
+"log_level" = "warn"
+
+"log_rotate_max_files" = 5
+"enable_syslog"        = false
+
+# ----------------------------------------- Networking
+"addresses" = {
+  "dns"   = "0.0.0.0"
+  "grpc"  = "0.0.0.0"
+  "http"  = "0.0.0.0"
+  "https" = "0.0.0.0"
+}
+"ports" = {
+  "dns"     = 8600
+  "http"    = 8500
+  "server"  = 8300
+}
+
+{% if 'linode' in group_names %}
+"advertise_addr"      = "{{ linode_private_ip }}"
+"bind_addr"           = "{{ linode_private_ip }}"
+"client_addr"         = "{{ linode_private_ip }} {{ '{{' }} GetInterfaceIP  \"docker0\" {{ '}}' }}"
+{% elif 'synology' in inventory_hostname %}
+"advertise_addr"      = "{{ synology_second_ip }}"
+"bind_addr"           = "{{ synology_second_ip }}"
+"client_addr"         = "{{ synology_second_ip }} {{ '{{' }} GetInterfaceIP  \"docker0\" {{ '}}' }}"
+{% else %}
+"advertise_addr"      = "{{ ansible_default_ipv4.address }}"
+"bind_addr"           = "{{ ansible_default_ipv4.address }}"
+"client_addr"         = "{{ ansible_default_ipv4.address }} {{ '{{' }} GetInterfaceIP  \"docker0\" {{ '}}' }}"
+{% endif %}
+"retry_interval"      = "30s"
+"retry_interval_wan"  = "30s"
+{% if 'linode' in group_names %}
+"retry_join"          = [{% for h in groups['linode-cluster'] if hostvars[h].is_consul_server == true %}"{{ hostvars[h].linode_private_ip }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+{% else %}
+"retry_join"          = [{% for h in groups['lan'] if hostvars[h].is_consul_server == true %}"{{ hostvars[h].ansible_host }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+  {% if is_consul_server %}
+    {% if 'linode' in group_names %}
+"join_wan"            = [{% for h in groups['linode-cluster'] if hostvars[h].is_consul_server == true %}"{{ hostvars[h].ansible_host }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+# ----------------------------------------- Security
+"encrypt"                   = "{{ consul_encryprion_key }}"
+{% if is_consul_server %}  {# Consul Servers #}
+"verify_incoming"           = true
+"verify_outgoing"           = true
+"verify_server_hostname"    = true
+{% if 'synology' in inventory_hostname %} {# necessary, since running in docker container #}
+"ca_file"                   = "/consul/data/certs/consul-agent-ca.pem"
+"cert_file"                 = "/consul/data/certs/{{ datacenter_name }}-server-consul-0.pem"
+"key_file"                  = "/consul/data/certs/{{ datacenter_name }}-server-consul-0-key.pem"
+{% else %}
+"ca_file"                   = "{{ consul_opt_dir }}/certs/consul-agent-ca.pem"
+"cert_file"                 = "{{ consul_opt_dir }}/certs/{{ datacenter_name }}-server-consul-0.pem"
+"key_file"                  = "{{ consul_opt_dir }}/certs/{{ datacenter_name }}-server-consul-0-key.pem"
+{% endif %}
+"auto_encrypt" = {
+  "allow_tls" = true
+}
+{% else %} {# Consul Clients #}
+"verify_incoming"           = false
+"verify_outgoing"           = true
+"verify_server_hostname"    = true
+{% if 'synology' in inventory_hostname %} {# necessary, since running in docker container #}
+"ca_file"                   = "/consul/data/certs/consul-agent-ca.pem"
+{% else %}
+"ca_file"                   = "{{ consul_opt_dir }}/certs/consul-agent-ca.pem"
+{% endif %}
+"auto_encrypt" = {
+  "tls" = true
+}
+{% endif %}
+
+"acl" = {
+  enabled                   = false
+  default_policy            = "allow"
+  enable_token_persistence  = true
+}
+
+# ----------------------------------------- Cluster Operations
+
+{% if is_cluster_leader is defined %}
+{% if is_cluster_leader %}
+"bootstrap"                   = true
+{% endif %}
+{% endif %}
+"disable_update_check"       = false
+"enable_local_script_checks" = false
+"enable_script_checks"       = false
+"skip_leave_on_interrupt"    = true
+"leave_on_terminate"         = false
+"primary_datacenter"         = "{{ datacenter_name }}"
+"performance"                = {
+  "leave_drain_time" = "5s"
+  "raft_multiplier"  = 1
+  "rpc_hold_timeout" = "7s"
+}
+{# telemetry = {
+  "dogstatsd_addr"     = "localhost:8125"
+  "disable_hostname"   = true
+  "disable_compat_1.9" = true
+} #}

@@ -1,0 +1,40 @@
+---
+# TASK DESCRIPTION:
+# Runs a git pull against all repositories in ~/repos by running a shellscript named 'pull_all_repos'.
+# NOTE: This shellscript is not part of this repository.
+
+- name: "Check if pull_all_repos exists"
+  ansible.builtin.stat:
+    path: "~/bin/pull_all_repos"
+  check_mode: false
+  register: pull_script_check
+
+- name: "Check if ~/repos exists"
+  ansible.builtin.stat:
+    path: "~/repos"
+  check_mode: false
+  register: repos_directory_check
+
+- name: "run pull_all_repos script"
+  ansible.builtin.command:
+    cmd: "~/bin/pull_all_repos --directory ~/repos"
+  register: pull_script_output
+  when:
+    - not ansible_check_mode
+    - pull_script_check.stat.exists
+    - pull_script_check.stat.executable
+    - repos_directory_check.stat.isdir is defined
+    - repos_directory_check.stat.isdir
+    - repos_directory_check.stat.writeable
+  failed_when: pull_script_output.rc > 1
+
+- name: "Output from pull_all_repos"
+  debug:
+    msg: "{{ pull_script_output.stdout }}"
+  when:
+    - not ansible_check_mode
+    - pull_script_check.stat.exists
+    - pull_script_check.stat.executable
+    - repos_directory_check.stat.isdir is defined
+    - repos_directory_check.stat.isdir
+    - repos_directory_check.stat.writeable

@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  plex:
+    image: ghcr.io/linuxserver/plex:latest
+    hostname: plex
+    container_name: plex
+    network_mode: "host"
+    environment:
+      - "TZ=America/New_York"
+      - "PGID=101"
+      - "PUID={{ ansible_user_uid }}"
+      - "VERSION=docker"
+    volumes:
+      - /volume1/media/media:/data/media
+      - /volume1/docker/plex:/config
+    restart: unless-stopped

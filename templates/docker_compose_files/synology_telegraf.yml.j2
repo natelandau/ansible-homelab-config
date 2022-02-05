@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  telegraf:
+    image: nuntz/telegraf-snmp:latest
+    hostname: telegraf
+    container_name: nuntz-telegraf-snmp
+    network_mode: "host"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /volume1/docker/telegraf/mibs:/usr/share/snmp/mibs
+      - /volume1/docker/telegraf/logs:/var/logs/telegraf
+      - /volume1/docker/telegraf/config:/etc/telegraf
+    restart: unless-stopped

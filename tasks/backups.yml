@@ -1,0 +1,47 @@
+---
+# TASK DESCRIPTION:
+# Nomad jobs which can not run with NFS storage use pre-start and post-stop tasks to invoke
+# shell scripts which keep the job's filesystem in sync.  This task does the following:
+#
+#     1. Copies a backup and restore shellscript to /usr/local/bin
+#     2. Edits the sudoers file to allow the script to be invoked with sudo privileges
+
+- name: copy backup shellscript to server
+  become: true
+  ansible.builtin.template:
+    src: scripts/service_backups.sh.j2
+    dest: /usr/local/bin/service_backups
+    mode: 0755
+  when:
+    - is_nomad_client or is_nomad_server
+
+- name: copy restore shellscript to server
+  become: true
+  ansible.builtin.template:
+    src: scripts/service_restore.sh.j2
+    dest: /usr/local/bin/service_restore
+    mode: 0755
+  when:
+    - is_nomad_client or is_nomad_server
+
+- name: ensure nomad user can run sudo with the restore script
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    state: present
+    line: "nomad ALL=(ALL) NOPASSWD: /usr/local/bin/service_backups, /usr/local/bin/service_restore"
+    validate: "/usr/sbin/visudo -cf %s"
+  when:
+    - is_nomad_client or is_nomad_server
+    - "'pis' in group_names"
+
+- name: ensure my user can run sudo with the restore script
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    state: present
+    line: "{{ ansible_user }} ALL=(ALL) NOPASSWD: /usr/local/bin/service_backups, /usr/local/bin/service_restore"
+    validate: "/usr/sbin/visudo -cf %s"
+  when:
+    - is_nomad_client or is_nomad_server
+    - "'pis' in group_names"

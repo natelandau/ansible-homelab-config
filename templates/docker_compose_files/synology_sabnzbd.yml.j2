@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  sabnzbd:
+    image: ghcr.io/linuxserver/sabnzbd
+    hostname: sabnzbd
+    container_name: sabnzbd
+    network_mode: "bridge"
+    environment:
+      - "TZ=America/New_York"
+      - "PGID=101"
+      - "PUID={{ ansible_user_uid }}"
+    volumes:
+      - /var/services/homes/{{ my_username }}:/{{ my_username }}
+      - /volume1/nate:/nate
+      - /volume1/media/downloads/nzb:/nzbd
+      - /volume1/media/downloads/temp:/incomplete-downloads
+      - /volume1/media/downloads/complete:/downloads
+      - /volume1/docker/sabnzbd:/config
+    ports:
+      - 8080:8080
+      - 9090:9090
+    restart: unless-stopped

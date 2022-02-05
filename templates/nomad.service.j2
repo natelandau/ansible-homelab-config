@@ -1,0 +1,25 @@
+[Unit]
+Description=Nomad
+Documentation=https://nomadproject.io/docs/
+Wants=network-online.target
+After=network-online.target
+ConditionFileNotEmpty={{ nomad_configuration_dir }}/nomad.hcl
+
+[Service]
+{# {% if 'linode' in group_names %} #}
+User=nomad
+Group=nomad
+{# {% endif %} #}
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart=/usr/local/bin/nomad agent -config {{ nomad_configuration_dir }}
+KillMode=process
+KillSignal=SIGINT
+LimitNOFILE=infinity
+LimitNPROC=infinity
+Restart=on-failure
+RestartSec=2
+StartLimitBurst=3
+TasksMax=infinity
+
+[Install]
+WantedBy=multi-user.target

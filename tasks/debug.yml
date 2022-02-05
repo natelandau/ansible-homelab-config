@@ -1,0 +1,37 @@
+---
+# - name: architecture
+#   debug:
+#     var: ansible_facts['architecture']
+
+# - name: distribution
+#   debug:
+#     var: ansible_facts['distribution']
+
+# - name: distribution_file_variety
+#   debug:
+#     var: ansible_facts['distribution_file_variety']
+
+# - name: service_mgr
+#   debug:
+#     var: ansible_facts['service_mgr']
+
+# - name: os_family
+#   debug:
+#     var: ansible_facts['os_family']
+
+# - debug:
+#     msg: "{{ ansible_os_family }}"
+
+# - debug:
+#     msg: "pass: {{ ansible_become_pass }}"
+
+# - debug:
+#     var: ansible_facts['nodename']
+
+# - debug:
+#     var: ansible_facts['system_vendor']
+#   when:
+#     - ansible_facts['system_vendor'] is search("Synology")
+
+- name: "end play"
+  ansible.builtin.meta: end_play

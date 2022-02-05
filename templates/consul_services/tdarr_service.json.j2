@@ -1,0 +1,25 @@
+{
+    "services": [{
+            "name": "tdarr",
+            "id": "tdarr",
+            "tags": [
+              "traefik.enable=true",
+              "traefik.http.services.tdarr.loadbalancer.server.port={{ tdarr_webui_port }}",
+              "traefik.http.routers.tdarr.rule=Host(`tdarr.{{ homelab_domain_name }}`)",
+              "traefik.http.routers.tdarr.entryPoints=web,websecure",
+              "traefik.http.routers.tdarr.service=tdarr",
+              "traefik.http.routers.tdarr.tls=true",
+              "traefik.http.routers.tdarr.tls.certresolver=cloudflare",
+              "traefik.http.routers.tdarr.middlewares=authelia@file"
+              ],
+            "checks": [{
+                "id": "tdarr-http-check",
+                "http": "http://{{ ansible_host }}:{{ tdarr_webui_port }}",
+                "interval": "30s",
+                "timeout": "30s",
+                "success_before_passing": 3,
+                "failures_before_critical": 3
+            }]
+        }
+    ]
+}

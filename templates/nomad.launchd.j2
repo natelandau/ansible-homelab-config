@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/usr/local/sbin</string>
+	</dict>
+	<key>KeepAlive</key>
+	<dict>
+		<key>PathState</key>
+		<dict>
+			<key>{{ mac_keep_alive_file }}</key>
+			<true/>
+		</dict>
+		<key>SuccessfulExit</key>
+		<true/>
+	</dict>
+	<key>Label</key>
+	<string>com.{{ my_username }}.nomad</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/local/bin/nomad</string>
+		<string>agent</string>
+		<string>-config</string>
+		<string>{{ nomad_configuration_dir }}</string>
+	</array>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>StandardErrorPath</key>
+  <string>/usr/local/var/log/nomad.log</string>
+  <key>StandardOutPath</key>
+  <string>/usr/local/var/log/nomad.log</string>
+</dict>
+</plist>
