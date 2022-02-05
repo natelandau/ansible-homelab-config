@@ -1,4 +1,4 @@
-# Homelab Ansible Playbook
+# Ansible Homelab Configuration
 
 Repository for managing computers, services, and orchestration on my home LAN via Ansible. **These files are heavily customized for my unique set-up and preferences** and are published in the hopes they are helpful to someone as a reference. Do not expect them to work without heavy customization for your own use.
 
