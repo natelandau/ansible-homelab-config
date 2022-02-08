@@ -48,9 +48,7 @@ job "overseerr" {
         image    = "ghcr.io/linuxserver/overseerr"
         hostname = "${NOMAD_JOB_NAME}"
         ports    = ["overseerr"]
-        volumes  = [
-          "${meta.nfsStorageRoot}/pi-cluster/overseerr:/config"
-        ]
+        volumes  = [ "${meta.nfsStorageRoot}/pi-cluster/overseerr:/config" ]
       } // docker config
 
       service  {

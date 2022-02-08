@@ -37,7 +37,12 @@ job "uptimekuma" {
       config {
         # When running a binary that exists on the host, the path must be absolute
         command = "${meta.restoreCommand}"
-        args = ["${meta.restoreCommand1}", "${meta.restoreCommand2}", "${NOMAD_JOB_NAME}", "${meta.restoreCommand3}"]
+        args = [
+          "${meta.restoreCommand1}",
+          "${meta.restoreCommand2}",
+          "${NOMAD_JOB_NAME}",
+          "${meta.restoreCommand3}"
+          ]
       }
 
       lifecycle {
@@ -99,7 +104,15 @@ job "uptimekuma" {
       config {
         # When running a binary that exists on the host, the path must be absolute
         command = "${meta.backupCommand}"
-        args    = ["${meta.backupAllocArg1}", "${meta.backupAllocArg2}", "${meta.backupAllocArg3}", "${meta.backupAllocArg4}", "${meta.backupAllocArg5}", "${NOMAD_JOB_NAME}", "${meta.backupAllocArg6}"]
+        args    = [
+          "${meta.backupAllocArg1}",
+          "${meta.backupAllocArg2}",
+          "${meta.backupAllocArg3}",
+          "${meta.backupAllocArg4}",
+          "${meta.backupAllocArg5}",
+          "${NOMAD_JOB_NAME}",
+          "${meta.backupAllocArg6}"
+          ]
       }
       lifecycle {
         hook    = "poststop"

@@ -47,9 +47,7 @@ job "changedetection" {
       config {
           image     = "dgtlmoon/changedetection.io:latest"
           hostname  = "${NOMAD_JOB_NAME}"
-          volumes   = [
-            "${meta.nfsStorageRoot}/pi-cluster/changedetection:/datastore"
-          ]
+          volumes   = [ "${meta.nfsStorageRoot}/pi-cluster/changedetection:/datastore" ]
           ports     = ["webUI"]
       } // docker config
 
