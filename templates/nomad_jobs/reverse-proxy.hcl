@@ -27,7 +27,7 @@ job "reverse-proxy" {
 
     network {
       port "authelia-port" {
-        static = { { authelia_port } }
+        static = {{ authelia_port }}
         to     = 9091
       }
       port "whoami" {
