@@ -64,19 +64,40 @@ job "reverse-proxy" {
               image    = "authelia/authelia"
               hostname = "authelia"
               ports    = ["authelia-port"]
-              volumes  = [
-                "${meta.nfsStorageRoot}/pi-cluster/authelia:/config"
-              ]
-              args       = [
+              volumes  = [ "${meta.nfsStorageRoot}/pi-cluster/authelia:/config" ]
+              args     = [
                 "--config",
-                "/local/authelia/config.yaml"
+                "/local/authelia/config.yml"
               ]
           } // docker config
 
           template {
-              destination = "local/authelia/config.yaml"
+              destination = "local/authelia/users.yml"
               env         = false
-              change_mode = "noop"
+              change_mode = "restart"
+              perms       = "644"
+              data        = <<-EOH
+                  ---
+                  ###############################################################
+                  #                         Users Database                      #
+                  ###############################################################
+
+                  # This file can be used if you do not have an LDAP set up.
+                  users:
+                    {{ authelia_user1_name }}:
+                      displayname: "{{ authelia_user1_name }}"
+                      password: "$argon2id$v=19$m=65536,t=1,p={{ authelia_user1_password }}"
+                      email: {{ authelia_user1_email }}
+                      groups:
+                        - admins
+                        - dev
+                  EOH
+          }
+
+          template {
+              destination = "local/authelia/config.yml"
+              env         = false
+              change_mode = "restart"
               perms       = "644"
               data        = <<-EOH
                   ---
@@ -108,7 +129,7 @@ job "reverse-proxy" {
                   authentication_backend:
                     disable_reset_password: false
                     file:
-                      path: /config/users.yml
+                      path: /local/authelia/users.yml
                       password:
                         algorithm: argon2id
                         iterations: 1
