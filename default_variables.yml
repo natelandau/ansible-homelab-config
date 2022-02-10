@@ -6,7 +6,7 @@ nomad_version: 1.2.5
 prometheus_verssion: 1.1.2
 tdarr_installer_version: 2.00.13
 telegraf_version: 1.19.1
-traefik_version: "v2.5.6"
+traefik_version: "v2.6.0"
 
 # ---------------------------------- SERVICE STATIC PORT MAPPINGS
 authelia_port: "9091"
