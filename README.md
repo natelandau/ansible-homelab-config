@@ -46,6 +46,7 @@ This playbook adds storage, services, applications, and configurations to a prev
   - [Grafana](https://grafana.com/) - Operational dashboards
   - [Grafana Loki](https://grafana.com/oss/loki/) - Log aggregation system
   - [Headless Trunk](https://github.com/alpeware/chrome-headless-trunk) - Headless Chromium
+  - [iCloud Drive Docker](https://github.com/mandarons/icloud-drive-docker) - Backup files and photos from Apple iCloud
   - [InfluxDB](https://www.influxdata.com/) - Time series database
   - [Lidarr](https://lidarr.audio/) - Music collection manager
   - [nginx](https://www.nginx.com/) - Web server
