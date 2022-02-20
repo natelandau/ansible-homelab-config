@@ -58,7 +58,7 @@ job "icloud_backup" {
                 app:
                   logger:
                     # level - debug, info, warning (default) or error
-                    level: "info"
+                    level: "warning"
                     # log filename icloud.log (default)
                     filename: "icloud.log"
                   credentials:
@@ -84,7 +84,7 @@ job "icloud_backup" {
                     # File filters to be included in syncing iCloud drive content
                     folders:
                       - "Scanner By Readdle"
-                      # - "folder2"
+                      - "Documents by Readdle"
                       # - "folder3"
                     file_extensions:
                       # File extensions to be included
@@ -115,12 +115,11 @@ job "icloud_backup" {
                       - "m4a"
                 photos:
                   destination: "photos"
-                  remove_obsolete: false
+                  remove_obsolete: true
                   sync_inteval: 720
                   filters:
                     albums:
-                      - "offline_backup"
-                      - "All Favorites"
+                      # - "album1"
                     file_sizes: # valid values are original, medium and/or thumb
                       - "original"
                       # - "medium"
@@ -128,10 +127,10 @@ job "icloud_backup" {
                 EOH
           } // template data
 
-      // resources {
-      //     cpu    = 100 # MHz
-      //     memory = 300 # MB
-      // } // resources
+      resources {
+          cpu    = 800 # MHz
+          memory = 100 # MB
+      } // resources
 
     } // task
 
