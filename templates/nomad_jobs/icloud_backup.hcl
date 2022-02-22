@@ -32,9 +32,10 @@ job "icloud_backup" {
     task "icloud_backup" {
 
       env {
-          PUID        = "${meta.PUID}"
-          PGID        = "${meta.PGID}"
-          TZ          = "America/New_York"
+          PUID                = "${meta.PUID}"
+          PGID                = "${meta.PGID}"
+          TZ                  = "America/New_York"
+          // ENV_ICLOUD_PASSWORD = "[icloud password]"  # 2FA renders this env var useless at the moment.
       }
 
       driver = "docker"
@@ -43,6 +44,7 @@ job "icloud_backup" {
           hostname = "${NOMAD_TASK_NAME}"
           volumes  = [
             "${meta.nfsStorageRoot}/nate/icloud_backup:/app/icloud",
+            "${meta.nfsStorageRoot}/pi-cluster/icloud_backup/session_data:/app/session_data",
             "local/icloud_backup.yaml:/app/config.yaml",
             "/etc/timezone:/etc/timezone:ro",
             "/etc/localtime:/etc/localtime:ro"
@@ -57,29 +59,31 @@ job "icloud_backup" {
               data        = <<-EOH
                 app:
                   logger:
-                    # level - debug, info, warning (default) or error
-                    level: "warning"
+                    # level - debug, info (default), warning, or error
+                    level: "info"
                     # log filename icloud.log (default)
                     filename: "icloud.log"
                   credentials:
                     # iCloud drive username
                     username: "{{ icloud_backup_username }}"
-                    # Retry login interval - default is 10 minutes
-                    retry_login_interval: 600
+                    # Retry login interval
+                    retry_login_interval: 3600  # 1 hour
                   # Drive destination
                   root: "icloud"
                   smtp:
                     # If you want to recieve email notifications about expired/missing 2FA credentials then uncomment
                     email: "{{ email_smtp_account }}"
+                    # optional, to email address. Default is sender email.
+                    #to: "receiver@test.com"
                     password: "{{ icloud_backup_smtp_password }}"
                     host: "{{ email_smtp_host }}"
-                    port: {{ email_smtp_port }}
+                    port: {{ email_smtp_port_starttls }}
                     # If your email provider doesn't handle TLS
                     no_tls: false
                 drive:
                   destination: "drive"
                   remove_obsolete: true
-                  sync_interval: 1440
+                  sync_interval: 21600 # 12 hours
                   filters:
                     # File filters to be included in syncing iCloud drive content
                     folders:
@@ -116,7 +120,7 @@ job "icloud_backup" {
                 photos:
                   destination: "photos"
                   remove_obsolete: true
-                  sync_inteval: 720
+                  sync_inteval: 21600 # 12 hours
                   filters:
                     albums:
                       # - "album1"
@@ -128,7 +132,7 @@ job "icloud_backup" {
           } // template data
 
       resources {
-          cpu    = 800 # MHz
+          cpu    = 900 # MHz
           memory = 100 # MB
       } // resources
 
