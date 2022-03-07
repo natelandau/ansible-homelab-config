@@ -49,6 +49,7 @@ This playbook adds storage, services, applications, and configurations to a prev
   - [iCloud Drive Docker](https://github.com/mandarons/icloud-drive-docker) - Backup files and photos from Apple iCloud
   - [InfluxDB](https://www.influxdata.com/) - Time series database
   - [Lidarr](https://lidarr.audio/) - Music collection manager
+  - [Mealie](https://hay-kot.github.io/mealie/) - Recipe management
   - [nginx](https://www.nginx.com/) - Web server
   - [OpenVSCode Server](https://github.com/gitpod-io/openvscode-server) - Run VS Code on a remote machine
   - [Overseerr](https://overseerr.dev/) - Media discovery and request management
