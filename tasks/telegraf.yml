@@ -163,7 +163,7 @@
         mode: "644"
       loop:
         - { src: "telegraf/base_config.conf.j2", dest: "{{ telegraph_config_location }}/telegraf.conf" }
-        - { src: "telegraf/temperature.conf.j2", dest: "{{ telegraph_config_location }}/telegraf.d/temperature.conf" }
+        - { src: "telegraf/custom_metrics.conf.j2", dest: "{{ telegraph_config_location }}/telegraf.d/custom_metrics.conf" }
         - { src: "telegraf/nomad.conf.j2", dest: "{{ telegraph_config_location }}/telegraf.d/nomad.conf" }
         - { src: "telegraf/docker.conf.j2", dest: "{{ telegraph_config_location }}/telegraf.d/docker.conf" }
       notify: restart_telegraf
@@ -181,7 +181,18 @@
         - is_cluster_leader
       notify: restart_telegraf
 
-    - name: Reset file ownership (macOS)
+    - name: Copy custom metrics script
+      become: true
+      ansible.builtin.template:
+        src: "scripts/telegraf_custom_metrics.sh.j2"
+        dest: "/usr/local/bin/telegraf_custom_metrics.sh"
+        mode: 0755
+        owner: "{{ ansible_user_uid }}"
+        group: "{{ ansible_user_gid }}"
+      when:
+        - inventory_hostname != 'synology'
+
+    - name: Reset file ownership
       become: true
       ansible.builtin.file:
         path: "{{ telegraph_config_location }}"

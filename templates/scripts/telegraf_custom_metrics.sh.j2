@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+EXTERNAL_IP="$(curl -s http://icanhazip.com)"
+
+# OS specific support
+if _uname=$(command -v uname); then
+    case $("${_uname}" | tr '[:upper:]' '[:lower:]') in
+        linux*)
+            TEMP="$(cat /sys/class/thermal/thermal_zone0/temp)"
+            ;;
+        darwin*)
+            if [ -e "/usr/local/bin/osx-cpu-temp" ]; then
+                TEMP="$(/usr/local/bin/osx-cpu-temp | cut -c -4 | sed -E 's/\.//g')00"
+            fi
+            ;;
+    esac
+fi
+
+# Print output
+printf "exec ip_external=%s,cpu_temp=%s" "\"${EXTERNAL_IP}\"" "${TEMP}"
