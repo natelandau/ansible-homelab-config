@@ -1,6 +1,6 @@
 ---
 # ---------------------------------- SOFTWARE VERSIONS
-consul_version: 1.10.4
+consul_version: 1.11.4
 influxdb_version: 1.8.4
 nomad_version: 1.2.5
 prometheus_verssion: 1.1.2
