@@ -148,7 +148,7 @@
       when:
         - ansible_os_family == 'Debian'
 
-    - name: "set owner of files to {{ ansible_user_uid }}:{{ ansible_user_gid }} (MacOSX)"
+    - name: "set owner of files to {{ ansible_user_uid }}:{{ ansible_user_gid }}"
       become: true
       ansible.builtin.file:
         path: "{{ consul_opt_dir }}"
@@ -156,7 +156,7 @@
         group: "{{ ansible_user_gid }}"
         recurse: true
       when:
-        - ansible_os_family != 'Debian'
+        - mac_intel or mac_arm or inventory_hostname == 'synology'
 
 - name: "Template out Consul configuration file"
   block:
@@ -184,10 +184,30 @@
       when:
         - ansible_os_family == 'Debian'
 
+    - name: "set owner of files to {{ ansible_user_uid }}:{{ ansible_user_gid }}"
+      become: true
+      ansible.builtin.file:
+        path: "{{ interpolated_consul_configuration_dir }}"
+        owner: "{{ ansible_user_uid }}"
+        group: "{{ ansible_user_gid }}"
+        recurse: true
+      when:
+        - mac_intel or mac_arm or inventory_hostname == 'synology'
+
+    - name: "set owner of root consul dir to {{ ansible_user_uid }}:{{ ansible_user_gid }} (synology)"
+      become: true
+      ansible.builtin.file:
+        path: /volume1/docker/consul/
+        owner: "{{ ansible_user_uid }}"
+        group: "{{ ansible_user_gid }}"
+        recurse: true
+      when:
+        - inventory_hostname == 'synology'
+
 - name: "Install Consul binary"
   block:
     - name: "set fact: need install consul?"
-      set_fact:
+      ansible.builtin.set_fact:
         need_consul_install: false
       when:
         - consul_download_uri is defined
@@ -200,7 +220,7 @@
         - consul_download_uri is defined
 
     - name: "set fact: need consul install?"
-      set_fact:
+      ansible.builtin.set_fact:
         need_consul_install: true
       when:
         - consul_download_uri is defined
@@ -218,7 +238,7 @@
         - not need_consul_install
 
     - name: "set fact: need consul install?"
-      set_fact:
+      ansible.builtin.set_fact:
         need_consul_install: true
       when:
         - consul_download_uri is defined
@@ -277,7 +297,7 @@
       ansible.builtin.command:
         cmd: "launchctl load -w {{ consul_plist_macos }}"
       when:
-        - ansible_os_family == 'Darwin'
+        - mac_intel or mac_arm
         - "'nostart' not in ansible_run_tags"
 
     - name: start Consul (Debian)

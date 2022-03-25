@@ -2,10 +2,12 @@ version: '3.9'
 
 services:
   consul:
-    image: consul:latest
+    image: consul:{{ consul_version }}
     hostname: consul
     container_name: consul
     network_mode: "host"
+    environment:
+      - CONSUL_DISABLE_PERM_MGMT=
     volumes:
       - /volume1/docker/consul/data:/consul/data
       - /volume1/docker/consul/config:/consul/config
