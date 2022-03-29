@@ -83,7 +83,7 @@ job "icloud_backup" {
                 drive:
                   destination: "drive"
                   remove_obsolete: true
-                  sync_interval: 21600 # 12 hours
+                  sync_interval: 172800 # 2 days
                   filters:
                     # File filters to be included in syncing iCloud drive content
                     folders:
@@ -120,7 +120,7 @@ job "icloud_backup" {
                 photos:
                   destination: "photos"
                   remove_obsolete: true
-                  sync_inteval: 21600 # 12 hours
+                  sync_inteval: 172800 # 2 days
                   filters:
                     albums:
                       # - "album1"
