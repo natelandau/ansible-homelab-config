@@ -73,8 +73,7 @@ job "mealie" {
               "traefik.http.routers.${NOMAD_TASK_NAME}.entryPoints=web,websecure",
               "traefik.http.routers.${NOMAD_TASK_NAME}.service=${NOMAD_TASK_NAME}",
               "traefik.http.routers.${NOMAD_TASK_NAME}.tls=true",
-              "traefik.http.routers.${NOMAD_TASK_NAME}.tls.certresolver=cloudflare",
-              "traefik.http.routers.${NOMAD_TASK_NAME}.middlewares=authelia@file"
+              "traefik.http.routers.${NOMAD_TASK_NAME}.tls.certresolver=cloudflare"
             ]
 
           check {
