@@ -17,4 +17,4 @@ if _uname=$(command -v uname); then
 fi
 
 # Print output
-printf "exec ip_external=%s,cpu_temp=%s" "\"${EXTERNAL_IP}\"" "${TEMP}"
+printf 'exec ip_external="%s",cpu_temp=%s' "${EXTERNAL_IP}" "${TEMP}"

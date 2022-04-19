@@ -35,7 +35,7 @@
 {% if 'pis' in group_names %}
   logtarget = "file"        ## destination  logs can be one of "file" or "stderr"
   logfile = "/var/log/telegraf/telegraf.log"
-  logfile_rotation_interval = "1d"
+  logfile_rotation_interval = "24h"
   # logfile_rotation_max_size = "0MB"
   logfile_rotation_max_archives = 2
 {% elif 'macs' in group_names %}

@@ -18,11 +18,11 @@ rules:
     quote-type: any
     required: false
     extra-required:
-      - '^http://'
-      - '^https://'
-      - 'ftp://'
+      - "^http://"
+      - "^https://"
+      - "ftp://"
       - 'ssh \w.*'
-      - '{{'
+      - "{{"
     extra-allowed: []
   truthy:
     level: error

@@ -5,8 +5,9 @@ influxdb_version: 1.8.4
 nomad_version: 1.2.5
 prometheus_verssion: 1.1.2
 tdarr_installer_version: 2.00.13
-telegraf_version: 1.21.4
+telegraf_version: 1.22.1
 traefik_version: "v2.6.0"
+speedtest_cli_version: "1.1.1"
 
 # ---------------------------------- SERVICE STATIC PORT MAPPINGS
 authelia_port: "9091"
