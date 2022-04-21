@@ -3,11 +3,11 @@ job "syncthing" {
   datacenters = ["{{ datacenter_name }}"]
   type        = "service"
 
-  // constraint {
-  //   attribute = "${node.unique.name}"
-  //   operator  = "regexp"
-  //   value     = "rpi(1|2|3)"
-  // }
+  constraint {
+    attribute = "${node.unique.name}"
+    operator  = "regexp"
+    value     = "rpi"
+  }
 
   update {
     max_parallel      = 1
