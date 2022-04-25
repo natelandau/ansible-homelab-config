@@ -4,3 +4,9 @@
   timeout = "1m"
   name_suffix = "_speedtest"
   data_format = "influx"
+
+[[outputs.influxdb]]
+  urls = ["http://influxdb.service.consul:{{ influxdb_port }}"]
+  database = "homelab"
+  retention_policy = "1month"
+  namepass = ["*_speedtest"]
