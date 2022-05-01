@@ -3,11 +3,11 @@ job "grafana" {
   datacenters = ["{{ datacenter_name }}"]
   type        = "service"
 
-  constraint {
-      attribute = "${node.unique.name}"
-      operator  = "regexp"
-      value     = "macmini"
-  }
+  // constraint {
+  //     attribute = "${node.unique.name}"
+  //     operator  = "regexp"
+  //     value     = "macmini"
+  // }
 
   update {
     max_parallel      = 1
