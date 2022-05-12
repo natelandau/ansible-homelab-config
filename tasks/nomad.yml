@@ -162,7 +162,7 @@
 - name: Install or Update Nomad
   block:
     - name: "set fact: do we need a nomad install?"
-      set_fact:
+      ansible.builtin.set_fact:
         need_nomad_install: false
 
     - name: Check if nomad is installed
@@ -171,7 +171,7 @@
       register: nomad_binary_file_location
 
     - name: "set fact: do we need a nomad install"
-      set_fact:
+      ansible.builtin.set_fact:
         need_nomad_install: true
       when:
         - not nomad_binary_file_location.stat.exists
@@ -186,15 +186,15 @@
         - not need_nomad_install
 
     - name: "set fact: do we need a nomad install"
-      set_fact:
+      ansible.builtin.set_fact:
         need_nomad_install: true
       when:
         - not need_nomad_install
-        - current_nomad_version.stdout != nomad_version
+        - current_nomad_version.stdout is version(nomad_version, '<')
 
     - name: install Nomad
       become: true
-      unarchive:
+      ansible.builtin.unarchive:
         src: "{{ nomad_download_file_uri }}"
         dest: /usr/local/bin
         remote_src: true

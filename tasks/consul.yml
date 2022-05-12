@@ -50,6 +50,11 @@
         consul_download_uri: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_darwin_amd64.zip"
       when: mac_intel
 
+    - name: "set variable: Set Consul download Binary (MacOSX)"
+      ansible.builtin.set_fact:
+        consul_download_uri: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_darwin_arm64.zip"
+      when: mac_arm
+
     - name: Assert that we can install Consul
       ansible.builtin.assert:
         that:
@@ -227,7 +232,7 @@
         - not consul_binary_file_location.stat.exists
 
     - name: Check current version of Consul
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: /usr/local/bin/consul --version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+'
       ignore_errors: true
       changed_when: false
@@ -243,7 +248,7 @@
       when:
         - consul_download_uri is defined
         - not need_consul_install
-        - installed_consul_version.stdout != consul_version
+        - installed_consul_version.stdout is version(consul_version, '<')
 
     - name: install Consul
       become: true
