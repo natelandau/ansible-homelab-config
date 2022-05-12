@@ -1,8 +1,8 @@
 ---
 # ---------------------------------- SOFTWARE VERSIONS
-consul_version: 1.11.4
+consul_version: 1.12.0
 influxdb_version: 1.8.4
-nomad_version: 1.2.5
+nomad_version: 1.3.0
 prometheus_verssion: 1.1.2
 tdarr_installer_version: 2.00.13
 telegraf_version: 1.22.1
