@@ -13,11 +13,12 @@ _mainScript_() {
         JOBS_T0_BACKUP=("${JOB}")
     else
         JOBS_T0_BACKUP=(
-            sonarr
-            radarr
             influxdb
             lidarr
             prowlarr
+            radarr
+            readarr
+            sonarr
             uptimekuma
         )
     fi
