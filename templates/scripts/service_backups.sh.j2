@@ -89,9 +89,10 @@ _mainScript_() {
 
         case "${1}" in
             lidarr) printf "%s" "lidarr.db config.xml" ;;
-            sonarr) printf "%s" "sonarr.db config.xml" ;;
-            radarr) printf "%s" "radarr.db config.xml" ;;
             prowlarr) printf "%s" "prowlarr.db config.xml" ;;
+            radarr) printf "%s" "radarr.db config.xml" ;;
+            readarr) printf "%s" "readarr.db config.xml" ;;
+            sonarr) printf "%s" "sonarr.db config.xml" ;;
             *) printf "%s" "." ;;
         esac
 

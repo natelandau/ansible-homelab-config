@@ -13,18 +13,19 @@ _mainScript_() {
         _safeExit_ 1
     fi
 
+    if [ -z ${JOB:-} ]; then
+        error "A job must be specified" "${LINENO}"
+        _safeExit_ 1
+    elif [ ! -d "{{ interpolated_localfs_service_storage }}" ]; then
+        error "Can not find parent directory expected at: {{ interpolated_localfs_service_storage }}" "${LINENO}"
+        _safeExit_ 1
+    elif [ ! -d "${BACKUP_DIR}" ]; then
+        error "Can not find backup directory expected at: ${BACKUP_DIR}" "${LINENO}"
+        _safeExit_ 1
+    fi
+
     JOB_DIR="{{ interpolated_localfs_service_storage }}/${JOB}"
-    debug "JOB_DIR: ${JOB_DIR}" ${LINENO}
-
-    if [ -z ${JOB:-} ] || [ ! -d "${JOB_DIR}" ]; then
-        error "Can not find job directory: ${JOB_DIR}" "${LINENO}"
-        _safeExit_ 1
-    fi
-
-    if [ ! -d "${BACKUP_DIR}" ]; then
-        error "Can not find backup directory: ${BACKUP_DIR}" "${LINENO}"
-        _safeExit_ 1
-    fi
+    debug "JOB_DIR: ${JOB_DIR}" "${LINENO}"
 
     # Identify the latest backup
     # shellcheck disable=SC2010
@@ -38,8 +39,11 @@ _mainScript_() {
 
     # Don't run as root on macOS
     if [[ $(_detectOS_) == mac ]]; then
+
         # Ensure destination directory is clean
-        _execute_ "command rm -rf \"${JOB_DIR:?}\""
+        if [ -d "${JOB_DIR}" ]; then
+            _execute_ "command rm -rf \"${JOB_DIR:?}\"" "Removing existing backup directory: ${JOB_DIR}"
+        fi
         _execute_ "mkdir \"${JOB_DIR:?}\""
 
         # Extract the backup
@@ -55,8 +59,11 @@ _mainScript_() {
         # Ensure permissions are correct
         _execute_ "chown -R {{ ansible_user_uid }}:{{ ansible_user_gid }} \"${JOB_DIR}\""
     else
+
         # Ensure destination directory is clean
-        _execute_ "_runAsRoot_ command rm -rf \"${JOB_DIR:?}\""
+        if [ -d "${JOB_DIR}" ]; then
+            _execute_ "_runAsRoot_ command rm -rf \"${JOB_DIR:?}\""
+        fi
         _execute_ "_runAsRoot_ mkdir \"${JOB_DIR:?}\""
 
         # Extract the backup
