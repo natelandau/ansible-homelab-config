@@ -61,7 +61,7 @@ job "reverse-proxy" {
 
           driver = "docker"
           config {
-              image    = "authelia/authelia"
+              image    = "authelia/authelia:{{ authelia_version }}"
               hostname = "authelia"
               ports    = ["authelia-port"]
               volumes  = [ "${meta.nfsStorageRoot}/pi-cluster/authelia:/config" ]
