@@ -4,6 +4,8 @@ exclude_paths:
   - .cache/
   - .github/
   - ../../.cache/
+  - .hooks/
+  - .vscode/
   - archived_data/
 
 skip_list:
