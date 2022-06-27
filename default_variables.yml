@@ -140,7 +140,6 @@ homebrew_package_list:
   - httpie
   - iperf
   - jq
-  - lesspipe
   - nano
   - ncurses
   - nmap
