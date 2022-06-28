@@ -1,22 +1,23 @@
 ---
 # Full documentation: https://ansible-lint.readthedocs.io/en/latest/index.html
 exclude_paths:
+  - ../../.cache/
   - .cache/
   - .github/
-  - ../../.cache/
   - .hooks/
   - .vscode/
   - archived_data/
+  - galaxy-roles/
 
 skip_list:
+  - command-instead-of-shell
+  - ignore-errors
+  - meta-incorrect
+  - meta-no-info
+  - package-latest
+  - role-name
   - unnamed-task
   - var-naming
-  - command-instead-of-shell
-  - meta-no-info
-  - meta-incorrect
-  - role-name
-  - ignore-errors
-  - package-latest
 
 warn_list:
   - experimental
