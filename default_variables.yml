@@ -1,14 +1,14 @@
 ---
 # ---------------------------------- SOFTWARE VERSIONS
-authelia_version: 4.36.2
-consul_version: 1.12.3
+authelia_version: 4.36.4
+consul_version: 1.13.0
 influxdb_version: 1.8.10
-nomad_version: 1.3.2
+nomad_version: 1.3.3
 prometheus_verssion: 1.1.2
 speedtest_cli_version: 1.1.1
 tdarr_installer_version: 2.00.13
-telegraf_version: 1.23.2
-traefik_version: "v2.8.0"
+telegraf_version: 1.23.3
+traefik_version: "v2.8.1"
 
 # ---------------------------------- SERVICE STATIC PORT MAPPINGS
 authelia_port: "9091"
