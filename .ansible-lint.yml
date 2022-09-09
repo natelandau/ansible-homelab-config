@@ -18,6 +18,7 @@ skip_list:
   - role-name
   - unnamed-task
   - var-naming
+  - name[casing]
 
 warn_list:
   - experimental
