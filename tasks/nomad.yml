@@ -39,6 +39,13 @@
         - ansible_os_family == 'Debian'
         - ansible_architecture == 'armv7l'
 
+    - name: "set variable: Set Nomad download Binary (aarch64)"
+      ansible.builtin.set_fact:
+        nomad_download_file_uri: "https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_linux_arm64.zip"
+      when:
+        - ansible_os_family == 'Debian'
+        - ansible_architecture == 'aarch64'
+
     - name: "set variable: Set Nomad download Binary (MacOSX)"
       ansible.builtin.set_fact:
         nomad_download_file_uri: "https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_darwin_amd64.zip"

@@ -50,6 +50,13 @@
         - ansible_os_family == 'Debian'
         - ansible_architecture == 'armv7l'
 
+    - name: "set variable: Set speedtest download Binary (aarch64)"
+      ansible.builtin.set_fact:
+        speedtest_download_file_uri: "https://install.speedtest.net/app/cli/ookla-speedtest-{{ speedtest_cli_version }}-linux-aarch64.tgz"
+      when:
+        - ansible_os_family == 'Debian'
+        - ansible_architecture == 'aarch64'
+
 - name: "Install/upgrade Telegraf"
   block:
     - name: "set fact: Need telegraf install?"
@@ -79,8 +86,8 @@
       check_mode: false
       changed_when: false
       when:
-        - telegraph_binary_location is defined
         - not need_telegraf_install
+        - telegraph_binary_location is defined
 
     - name: "set fact: Need telegraf install?"
       ansible.builtin.set_fact:
@@ -88,12 +95,6 @@
       when:
         - telegraph_binary_location is defined
         - not need_telegraf_install
-        - current_telegraf_version.stdout is version(telegraf_version, '<')
-
-    - ansible.builtin.debug:
-        msg: "Current telegraf version {{ current_telegraf_version.stdout }} is lower than specified {{ telegraf_version }}"
-      when:
-        - telegraph_binary_location is defined
         - current_telegraf_version.stdout is version(telegraf_version, '<')
 
     - name: install telegraf (MacOS)

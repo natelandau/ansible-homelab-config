@@ -4,7 +4,7 @@
 
 - name: Set variables needed to install consul
   block:
-    - name: "set variable: check if we have a mounted USB drive (Debian)"
+    - name: "Set variable: check if we have a mounted USB drive (Debian)"
       ansible.builtin.stat:
         path: "{{ rpi_usb_drive_mount_point }}"
       register: have_usb_drive
@@ -12,45 +12,52 @@
       when:
         - ansible_os_family == 'Debian'
 
-    - name: "set variable: Use USB drive for consul /opt (Debian)"
+    - name: "Set variable: Use USB drive for consul /opt (Debian)"
       ansible.builtin.set_fact:
         consul_opt_dir: "{{ rpi_usb_drive_mount_point }}/opt/consul"
       when:
         - ansible_os_family == 'Debian'
         - have_usb_drive.stat.exists
 
-    - name: "set variable: Use root disk for consul /opt (Debian)"
+    - name: "Set variable: Use root disk for consul /opt (Debian)"
       ansible.builtin.set_fact:
         consul_opt_dir: "/opt/consul"
       when:
         - ansible_os_family == 'Debian'
         - not have_usb_drive.stat.exists
 
-    - name: "set variable: Use ~/library for /opt files (macOSX)"
+    - name: "Set variable: Use ~/library for /opt files (macOSX)"
       ansible.builtin.set_fact:
         consul_opt_dir: "/Users/{{ ansible_user }}/Library/consul"
       when:
         - mac_intel or mac_arm
 
-    - name: "set variable: Use ~/volume1/docker/consul/data for /opt files (synology)"
+    - name: "Set variable: Use ~/volume1/docker/consul/data for /opt files (synology)"
       ansible.builtin.set_fact:
         consul_opt_dir: "/volume1/docker/consul/data"
       when:
         - inventory_hostname == 'synology'
 
-    - name: "set variable: Set Consul download Binary (armv7l)"
+    - name: "Set variable: Set Consul download Binary (armv7l)"
       ansible.builtin.set_fact:
         consul_download_uri: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_linux_arm.zip"
       when:
         - ansible_os_family == 'Debian'
         - ansible_architecture == 'armv7l'
 
-    - name: "set variable: Set Consul download Binary (MacOSX)"
+    - name: "Set variable: Set Consul download Binary (aarch64)"
+      ansible.builtin.set_fact:
+        consul_download_uri: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_linux_arm64.zip"
+      when:
+        - ansible_os_family == 'Debian'
+        - ansible_architecture == 'aarch64'
+
+    - name: "Set variable: Set Consul download Binary (MacOSX)"
       ansible.builtin.set_fact:
         consul_download_uri: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_darwin_amd64.zip"
       when: mac_intel
 
-    - name: "set variable: Set Consul download Binary (MacOSX)"
+    - name: "Set variable: Set Consul download Binary (MacOSX)"
       ansible.builtin.set_fact:
         consul_download_uri: "https://releases.hashicorp.com/consul/{{ consul_version }}/consul_{{ consul_version }}_darwin_arm64.zip"
       when: mac_arm
@@ -65,7 +72,7 @@
 
 - name: "Stop Consul"
   block:
-    - name: "stop consul systemd service (Debian)"
+    - name: "Stop consul systemd service (Debian)"
       become: true
       ansible.builtin.systemd:
         name: consul
@@ -74,14 +81,14 @@
         - ansible_os_family == 'Debian'
         - ansible_facts.services["consul.service"] is defined
 
-    - name: "check if plist file exists (MacOSX)"
+    - name: "Check if plist file exists (MacOSX)"
       ansible.builtin.stat:
         path: "{{ consul_plist_macos }}"
       register: consul_file
       when:
         - ansible_os_family == 'Darwin'
 
-    - name: "unload consul agent (MacOSX)"
+    - name: "Unload consul agent (MacOSX)"
       become: true
       ansible.builtin.command:
         cmd: "launchctl unload {{ consul_plist_macos }}"
@@ -107,7 +114,7 @@
 
 - name: "Create Consul /opt storage and copy certificates"
   block:
-    - name: "create {{ consul_opt_dir }} directories"
+    - name: "Create {{ consul_opt_dir }} directories"
       become: true
       ansible.builtin.file:
         path: "{{ item }}"
@@ -143,7 +150,7 @@
         - is_consul_client
         - not is_consul_server
 
-    - name: "set owner of files to consul:consul (debian)"
+    - name: "Set owner of files to consul:consul (debian)"
       become: true
       ansible.builtin.file:
         path: "{{ consul_opt_dir }}"
@@ -153,7 +160,7 @@
       when:
         - ansible_os_family == 'Debian'
 
-    - name: "set owner of files to {{ ansible_user_uid }}:{{ ansible_user_gid }}"
+    - name: "Set owner of files to {{ ansible_user_uid }}:{{ ansible_user_gid }}"
       become: true
       ansible.builtin.file:
         path: "{{ consul_opt_dir }}"
@@ -165,21 +172,21 @@
 
 - name: "Template out Consul configuration file"
   block:
-    - name: "create {{ interpolated_consul_configuration_dir }}"
+    - name: "Create {{ interpolated_consul_configuration_dir }}"
       become: true
       ansible.builtin.file:
         path: "{{ interpolated_consul_configuration_dir }}"
         state: directory
         mode: 0755
 
-    - name: copy consul base config file
+    - name: Copy consul base config file
       become: true
       ansible.builtin.template:
         src: consul.hcl.j2
         dest: "{{ interpolated_consul_configuration_dir }}/consul.hcl"
         mode: 0644
 
-    - name: "set owner of files to consul:consul (Debian)"
+    - name: "Set owner of files to consul:consul (Debian)"
       become: true
       ansible.builtin.file:
         path: "{{ interpolated_consul_configuration_dir }}"
@@ -189,7 +196,7 @@
       when:
         - ansible_os_family == 'Debian'
 
-    - name: "set owner of files to {{ ansible_user_uid }}:{{ ansible_user_gid }}"
+    - name: "Set owner of files to {{ ansible_user_uid }}:{{ ansible_user_gid }}"
       become: true
       ansible.builtin.file:
         path: "{{ interpolated_consul_configuration_dir }}"
@@ -199,7 +206,7 @@
       when:
         - mac_intel or mac_arm or inventory_hostname == 'synology'
 
-    - name: "set owner of root consul dir to {{ ansible_user_uid }}:{{ ansible_user_gid }} (synology)"
+    - name: "Set owner of root consul dir to {{ ansible_user_uid }}:{{ ansible_user_gid }} (synology)"
       become: true
       ansible.builtin.file:
         path: /volume1/docker/consul/
@@ -211,7 +218,7 @@
 
 - name: "Install Consul binary"
   block:
-    - name: "set fact: need install consul?"
+    - name: "Set fact: need install consul?"
       ansible.builtin.set_fact:
         need_consul_install: false
       when:
@@ -224,7 +231,7 @@
       when:
         - consul_download_uri is defined
 
-    - name: "set fact: need consul install?"
+    - name: "Set fact: need consul install?"
       ansible.builtin.set_fact:
         need_consul_install: true
       when:
@@ -242,7 +249,7 @@
         - consul_download_uri is defined
         - not need_consul_install
 
-    - name: "set fact: need consul install?"
+    - name: "Set fact: need consul install?"
       ansible.builtin.set_fact:
         need_consul_install: true
       when:
@@ -250,7 +257,7 @@
         - not need_consul_install
         - installed_consul_version.stdout is version(consul_version, '<')
 
-    - name: install Consul
+    - name: Install Consul
       become: true
       ansible.builtin.unarchive:
         src: "{{ consul_download_uri }}"
@@ -260,7 +267,7 @@
         - consul_download_uri is defined
         - need_consul_install
 
-- name: "validate consul config"
+- name: "Validate consul config"
   ansible.builtin.command:
     cmd: "/usr/local/bin/consul validate {{ interpolated_consul_configuration_dir }}"
   register: consul_config_valid
@@ -271,7 +278,7 @@
 
 - name: "Copy system.d or launchctl service files"
   block:
-    - name: ensure /Library/LaunchAgents exists (MacOSX)
+    - name: Ensure /Library/LaunchAgents exists (MacOSX)
       ansible.builtin.file:
         path: "{{ consul_plist_macos | dirname }}"
         state: directory
@@ -279,7 +286,7 @@
       when:
         - ansible_os_family == 'Darwin'
 
-    - name: create Consul launchd service (MacOSX)
+    - name: Create Consul launchd service (MacOSX)
       ansible.builtin.template:
         src: consul.launchd.j2
         dest: "{{ consul_plist_macos }}"
@@ -287,7 +294,7 @@
       when:
         - ansible_os_family == 'Darwin'
 
-    - name: create Consul service (Debian)
+    - name: Create Consul service (Debian)
       become: true
       ansible.builtin.template:
         src: consul.service.j2
@@ -298,14 +305,14 @@
 
 - name: "Start Consul"
   block:
-    - name: load the Consul agent (MacOSX)
+    - name: Load the Consul agent (MacOSX)
       ansible.builtin.command:
         cmd: "launchctl load -w {{ consul_plist_macos }}"
       when:
         - mac_intel or mac_arm
         - "'nostart' not in ansible_run_tags"
 
-    - name: start Consul (Debian)
+    - name: Start Consul (Debian)
       become: true
       ansible.builtin.systemd:
         name: consul
@@ -315,7 +322,7 @@
         - ansible_os_family == 'Debian'
         - "'nostart' not in ansible_run_tags"
 
-    - name: make sure Consul service is really running
+    - name: Make sure Consul service is really running
       ansible.builtin.command:
         cmd: systemctl is-active consul
       register: is_consul_really_running
@@ -329,7 +336,7 @@
   when:
     - inventory_hostname == 'synology'
   block:
-    - name: copy config file
+    - name: Copy config file
       ansible.builtin.template:
         src: consul_services/consul_synology_checks.json.j2
         dest: "{{ interpolated_consul_configuration_dir }}/service_checks.json"
@@ -345,7 +352,7 @@
       register: consul_agent_reload_http_response
       failed_when: consul_agent_reload_http_response.status != 200
 
-    - name: debug when consul agent reload fails
+    - name: Debug when consul agent reload fails
       ansible.builtin.debug:
         var: consul_agent_reload_http_response.msg
       check_mode: false
