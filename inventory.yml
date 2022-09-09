@@ -56,6 +56,7 @@ all:
               is_prometheus_node: true
               is_telegraf_client: true
               manage_apt_packages_list: true
+              ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
             rpi2:
               ansible_host: 10.0.30.92
               ansible_user: "{{ pi_username }}"
@@ -69,6 +70,7 @@ all:
               is_nomad_client: true
               is_telegraf_client: true
               manage_apt_packages_list: true
+              ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
             rpi3:
               ansible_host: 10.0.30.93
               ansible_user: "{{ pi_username }}"
@@ -82,6 +84,7 @@ all:
               is_nomad_client: true
               is_telegraf_client: true
               manage_apt_packages_list: true
+              ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
             rpi4:
               ansible_host: 10.0.30.94
               ansible_user: "{{ pi_username }}"
@@ -95,6 +98,7 @@ all:
               is_nomad_client: true
               is_telegraf_client: true
               manage_apt_packages_list: true
+              ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
         macs:
           hosts:
             macmini:
@@ -111,6 +115,7 @@ all:
               is_tdarr_server: true
               is_tdarr_node: true
               manage_homebrew_package_list: true
+              ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
             imac:
               ansible_host: 10.0.0.25
               ansible_user: "{{ my_username }}"
@@ -122,6 +127,7 @@ all:
               manage_homebrew_package_list: true
               is_tdarr_node: true
               is_shared_storage_client: true
+              ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
             skimmbook:
               ansible_host: 10.0.0.21
               ansible_user: "{{ my_username }}"
@@ -133,6 +139,7 @@ all:
               manage_homebrew_package_list: true
               is_tdarr_node: true
               is_shared_storage_client: true
+              ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
             vpnmac:
               ansible_host: 10.0.90.2
               ansible_user: "{{ my_username }}"
@@ -143,6 +150,7 @@ all:
               mac_arm: true
               manage_homebrew_package_list: true
               is_tdarr_node: true
+              ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
         nas:
           hosts:
             synology:
