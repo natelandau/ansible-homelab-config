@@ -14,7 +14,7 @@
   block:
     - name: "Add docker local filesystem storage directory"
       ansible.builtin.file:
-        path: "{{ rpi_localfs_storage }}"
+        path: "{{ rpi_localfs_service_storage }}"
         mode: 0755
         state: directory
 
@@ -56,7 +56,7 @@
   block:
     - name: "Add docker directory to ~/Library"
       ansible.builtin.file:
-        path: "{{ mac_localfs_storage }}"
+        path: "{{ mac_localfs_service_storage }}"
         mode: 0755
         state: directory
 
