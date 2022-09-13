@@ -34,6 +34,7 @@
         fstype: nfs
         opts: defaults,hard,intr,timeo=14
         state: mounted
+        boot: true
       loop: "{{ rpi_nfs_mounts_list }}"
 
 # --------------------------------- Mount on Macs
