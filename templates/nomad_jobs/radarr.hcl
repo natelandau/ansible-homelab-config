@@ -6,7 +6,7 @@ job "radarr" {
   // constraint {
   //   attribute = "${node.unique.name}"
   //   operator  = "regexp"
-  //   value     = "rpi"
+  //   value     = "rpi3"
   // }
 
   update {

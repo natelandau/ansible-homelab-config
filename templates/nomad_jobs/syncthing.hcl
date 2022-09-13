@@ -9,6 +9,13 @@ job "syncthing" {
     value     = "rpi"
   }
 
+  // constraint {
+  //   attribute = "${attr.cpu.arch}"
+  //   operator  = "regexp"
+  //   value     = "64"
+  // }
+
+
   update {
     max_parallel      = 1
     health_check      = "checks"

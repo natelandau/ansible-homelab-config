@@ -4,9 +4,9 @@ job "sonarr" {
   type        = "service"
 
   // constraint {
-  //   attribute = "${node.unique.name}"
+  //   attribute = "${attr.cpu.arch}"
   //   operator  = "regexp"
-  //   value     = "macmini"
+  //   value     = "64"
   // }
 
   update {

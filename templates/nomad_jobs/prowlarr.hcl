@@ -5,9 +5,9 @@ job "prowlarr" {
   type        = "service"
 
   // constraint {
-  //   attribute = "${node.unique.name}"
+  //   attribute = "${attr.cpu.arch}"
   //   operator  = "regexp"
-  //   value     = "rpi4"
+  //   value     = "64"
   // }
 
   update {

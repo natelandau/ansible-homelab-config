@@ -4,9 +4,9 @@ job "influxdb" {
   type        = "service"
 
   // constraint {
-  //   attribute = "${node.unique.name}"
+  //   attribute = "${attr.cpu.arch}"
   //   operator  = "regexp"
-  //   value     = "rpi"
+  //   value     = "64"
   // }
 
   update {

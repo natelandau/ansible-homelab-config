@@ -4,9 +4,9 @@ job "whoogle" {
   type        = "service"
 
   // constraint {
-  //   attribute = "${node.unique.name}"
+  //   attribute = "${attr.cpu.arch}"
   //   operator  = "regexp"
-  //   value     = "rpi(1|2|3)"
+  //   value     = "64"
   // }
 
   update {
