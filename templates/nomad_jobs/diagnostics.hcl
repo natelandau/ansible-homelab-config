@@ -3,11 +3,11 @@ job "diagnostics" {
   datacenters = ["{{ datacenter_name }}"]
   type        = "service"
 
-  // constraint {
-  //   attribute = "${node.unique.name}"
-  //   operator  = "regexp"
-  //   value     = "rpi(1|2|3)"
-  // }
+  constraint {
+    attribute = "${node.unique.name}"
+    operator  = "regexp"
+    value     = "rpi1"
+  }
 
   group "diagnostics" {
 
@@ -16,6 +16,12 @@ job "diagnostics" {
     restart {
       attempts = 0
       delay    = "30s"
+    }
+
+    network {
+        port "whoami" {
+            to     = 80
+        }
     }
 
     task "diagnostics" {
@@ -59,6 +65,45 @@ job "diagnostics" {
           EOH
       }
 
-    } // tasks
+    } // task diagnostics
+    task "whoami" {
+        driver = "docker"
+        config {
+          image         = "containous/whoami:latest"
+          hostname      = "${NOMAD_TASK_NAME}"
+          ports         = ["whoami"]
+
+        } // /docker config
+
+        service {
+          port = "whoami"
+          name = "${NOMAD_JOB_NAME}"
+          tags = [
+            "traefik.enable=true",
+            "traefik.http.routers.${NOMAD_JOB_NAME}.rule=Host(`${NOMAD_JOB_NAME}.{{ homelab_domain_name }}`)",
+            "traefik.http.routers.${NOMAD_JOB_NAME}.entryPoints=web,websecure",
+            "traefik.http.routers.${NOMAD_JOB_NAME}.service=${NOMAD_JOB_NAME}",
+            "traefik.http.routers.${NOMAD_JOB_NAME}.tls=true",
+            "traefik.http.routers.${NOMAD_JOB_NAME}.tls.certresolver=cloudflare"
+            ]
+          check {
+            type     = "http"
+            path     = "/"
+            interval = "90s"
+            timeout  = "15s"
+          }
+          check_restart {
+            limit           = 2
+            grace           = "1m"
+            ignore_warnings = true
+          }
+        }
+        resources {
+            cpu    = 25 # MHz
+            memory = 10 # MB
+        }
+
+    } // /task whoami
+
   } // group
 } // job
