@@ -3,11 +3,11 @@ job "changedetection" {
     datacenters = ["{{ datacenter_name }}"]
     type        = "service"
 
-    // constraint {
-    //     attribute = "${node.unique.name}"
-    //     operator  = "regexp"
-    //     value     = "rpi(1|2|3)"
-    // }
+  constraint {
+    attribute = "${attr.cpu.arch}"
+    operator  = "regexp"
+    value     = "64"
+  }
 
   update {
       max_parallel      = 1
@@ -38,6 +38,7 @@ job "changedetection" {
     task "changedetection" {
 
       env {
+          TZ          = "America/New_York"
           PUID        = "${meta.PUID}"
           PGID        = "${meta.PGID}"
           BASE_URL    = "https://changes.{{ homelab_domain_name }}"
@@ -45,9 +46,11 @@ job "changedetection" {
 
       driver = "docker"
       config {
-          image     = "dgtlmoon/changedetection.io:latest"
+          image     = "lscr.io/linuxserver/changedetection.io:latest"
           hostname  = "${NOMAD_JOB_NAME}"
-          volumes   = [ "${meta.nfsStorageRoot}/pi-cluster/changedetection:/datastore" ]
+          volumes   = [
+                        "${meta.nfsStorageRoot}/pi-cluster/changedetection:/config",
+                      ]
           ports     = ["webUI"]
       } // docker config
 
