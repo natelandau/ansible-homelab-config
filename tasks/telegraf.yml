@@ -128,7 +128,7 @@
     - name: Add telegraf repository to apt (Debian)
       become: true
       ansible.builtin.apt_repository:
-        repo: deb https://repos.influxdata.com/debian buster stable
+        repo: deb https://repos.influxdata.com/debian bullseye stable
         state: present
       when:
         - ansible_os_family == 'Debian'
