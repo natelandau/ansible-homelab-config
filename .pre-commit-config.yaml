@@ -3,7 +3,7 @@ repos:
   - hooks:
       - id: "commitizen"
     repo: https://github.com/commitizen-tools/commitizen
-    rev: master
+    rev: v2.35.0
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.3.0
     hooks:
@@ -29,7 +29,7 @@ repos:
         types: [python]
         args: [--markdown-linebreak-ext=md]
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: master
+    rev: v1.28.0
     hooks:
       - id: yamllint
         exclude: vault\.yml|\.pre-commit-config.yaml
