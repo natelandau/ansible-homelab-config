@@ -23,7 +23,7 @@
               - nodateext
               - nocreate
               - delaycompress
-  import_role:
+  ansible.builtin.import_role:
     name: arillso.logrotate
   failed_when: false
   ignore_errors: true

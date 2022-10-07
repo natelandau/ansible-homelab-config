@@ -11,6 +11,7 @@ exclude_paths:
 
 skip_list:
   - command-instead-of-shell
+  - name[template]
   - ignore-errors
   - meta-incorrect
   - meta-no-info

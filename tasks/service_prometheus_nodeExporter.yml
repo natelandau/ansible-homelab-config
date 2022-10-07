@@ -5,7 +5,7 @@
 # NOTE: This is depreciated, I no longer use Prometheus and have migrated to Telegraf
 
 - name: populate service facts
-  service_facts:
+  ansible.builtin.service_facts:
 
 - name: stop node_exporter
   become: true
@@ -30,7 +30,7 @@
 
 # --------------- Install or Update Prometheus
 - name: "set fact: need to install Prometheus?"
-  set_fact:
+  ansible.builtin.set_fact:
     need_prometheus_install: false
 
 - name: Check if node_exporter is installed
@@ -39,7 +39,7 @@
   register: prometheus_binary_file_location
 
 - name: "set fact: need to install Prometheus?"
-  set_fact:
+  ansible.builtin.set_fact:
     need_prometheus_install: true
   when:
     - not prometheus_binary_file_location.stat.exists
@@ -53,7 +53,7 @@
     - need_prometheus_install is false
 
 - name: "set fact: need to install Prometheus?"
-  set_fact:
+  ansible.builtin.set_fact:
     need_prometheus_install: true
   when:
     - need_prometheus_install is false

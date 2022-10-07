@@ -29,7 +29,7 @@
   failed_when: pull_script_output.rc > 1
 
 - name: "Output from pull_all_repos"
-  debug:
+  ansible.builtin.debug:
     msg: "{{ pull_script_output.stdout }}"
   when:
     - not ansible_check_mode

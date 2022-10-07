@@ -38,7 +38,7 @@
         - mac_arm
 
     - name: "set fact: do we need a tdarr install?"
-      set_fact:
+      ansible.builtin.set_fact:
         need_tdarr_install: false
 
     - name: Assert that we can install Tdarr
@@ -90,7 +90,7 @@
       failed_when: false
 
     - name: "set fact: do we need a tdarr install?"
-      set_fact:
+      ansible.builtin.set_fact:
         need_tdarr_install: true
       when: not tdarr_exists.stat.exists
 
@@ -186,4 +186,4 @@
         - consul_agent_reload_http_response.status != 200
 
 - name: mount shared storage
-  import_tasks: cluster_storage.yml
+  ansible.builtin.import_tasks: cluster_storage.yml

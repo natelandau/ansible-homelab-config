@@ -1,5 +1,6 @@
 ---
 - hosts: all
+  name: "Running playbook"
   serial: 1
 
   vars_files:
@@ -8,19 +9,19 @@
 
   pre_tasks:
     - name: Run sanity checks
-      import_tasks: tasks/sanity.yml
+      ansible.builtin.import_tasks: tasks/sanity.yml
       tags: ["always", "sanity"]
     - name: populate service facts
-      service_facts:
+      ansible.builtin.service_facts:
       tags: ["nomad", "consul"]
     - name: Run debug tasks
-      import_tasks: tasks/debug.yml
+      ansible.builtin.import_tasks: tasks/debug.yml
       tags: [never, debug]
     - name: populate device specific variables
-      import_tasks: tasks/interpolated_variables.yml
+      ansible.builtin.import_tasks: tasks/interpolated_variables.yml
       tags: ["always"]
     - name: Ensure we have up-to-date packages
-      import_tasks: tasks/packages.yml
+      ansible.builtin.import_tasks: tasks/packages.yml
       tags: ["packages", "update"]
     - name: Set clean nomad_jobs_dir variable
       ansible.builtin.set_fact:
@@ -29,50 +30,50 @@
 
   tasks:
     - name: Configure cluster NFS mounts
-      import_tasks: tasks/cluster_storage.yml
+      ansible.builtin.import_tasks: tasks/cluster_storage.yml
       tags: ["storage"]
       when:
         - is_nomad_client or is_nomad_server or is_shared_storage_client
     - name: Install Docker
-      import_tasks: tasks/docker.yml
+      ansible.builtin.import_tasks: tasks/docker.yml
       tags: ["docker"]
       when: "'nas' not in group_names"
     - name: Install and Upgrade Consul
-      import_tasks: tasks/consul.yml
+      ansible.builtin.import_tasks: tasks/consul.yml
       tags: ["consul"]
       when: is_consul_client or is_consul_server
     - name: Install and Upgrade Nomad
-      import_tasks: tasks/nomad.yml
+      ansible.builtin.import_tasks: tasks/nomad.yml
       tags: ["nomad"]
       when: is_nomad_client or is_nomad_server
     - name: Orchestration Jobs
-      import_tasks: tasks/orchestration_jobs.yml
+      ansible.builtin.import_tasks: tasks/orchestration_jobs.yml
       tags: ["jobs", "update"]
     - name: Prometheus Node Exporter
-      import_tasks: tasks/service_prometheus_nodeExporter.yml
+      ansible.builtin.import_tasks: tasks/service_prometheus_nodeExporter.yml
       tags: ["prometheus_exporter"]
       when:
         - is_prometheus_node
         - "'pis' in group_names"
     - name: Install backup scripts
-      import_tasks: tasks/backups.yml
+      ansible.builtin.import_tasks: tasks/backups.yml
       tags: ["backup", "backups"]
       when: is_nomad_client or is_nomad_server
     - name: Install and configure Telegraf
-      import_tasks: tasks/telegraf.yml
+      ansible.builtin.import_tasks: tasks/telegraf.yml
       tags: ["telegraf"]
       when: is_telegraf_client
     - name: Pull repositories
-      import_tasks: tasks/pull_repositories.yml
+      ansible.builtin.import_tasks: tasks/pull_repositories.yml
       tags: ["never", "update", "repos"]
     - name: Configure log rotate
-      import_tasks: tasks/logrotate.yml
+      ansible.builtin.import_tasks: tasks/logrotate.yml
       tags: ["logrotate"]
       when: is_cluster_leader
     - name: Install and configure tdarr
-      import_tasks: tasks/tdarr.yml
+      ansible.builtin.import_tasks: tasks/tdarr.yml
       tags: ["tdarr"]
       when: is_tdarr_server or is_tdarr_node
 
   handlers:
-    - import_tasks: handlers/main.yml
+    - ansible.builtin.import_tasks: handlers/main.yml
