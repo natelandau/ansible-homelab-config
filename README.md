@@ -1,70 +1,72 @@
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+
 # Ansible Homelab Configuration
 
 Repository for managing computers, services, and orchestration on my home LAN via Ansible. **These files are heavily customized for my unique set-up and preferences** and are published in the hopes they are helpful to someone as a reference. Do not expect them to work without heavy customization for your own use.
 
 ## Infrastructure
 
-- **[Protectli FW4B](https://protectli.com/vault-4-port/)** running [Opnsense](https://opnsense.org)
-- **Cisco SG250-26P** - 26 port managed POE switch
-- **Four RaspberryPi 4b** boards running Raspbian Lite
-- **Mac Mini** (2018) used for media conversion and serving, backups, and amd64 only Docker containers (why can't we have multi-arch everywhere people? Why?)
-- **Synology DS16+II** - 8TB in SHR with BTRFS
+-   **[Protectli FW4B](https://protectli.com/vault-4-port/)** running [Opnsense](https://opnsense.org)
+-   **Cisco SG250-26P** - 26 port managed POE switch
+-   **Four RaspberryPi 4b** boards running Raspbian Lite
+-   **Mac Mini** (2018) used for media conversion and serving, backups, and amd64 only Docker containers (why can't we have multi-arch everywhere people? Why?)
+-   **Synology DS16+II** - 8TB in SHR with BTRFS
 
 ## Backups
 
-- Most jobs use NFS storage on the NAS for volume mounts. Jobs who require their storage to be available on a local machine are backed up to the NAS using custom shell scripts which are called as pre/post tasks in their Nomad job file. These custom scripts are written using these [shell script templates](https://github.com/natelandau/shell-scripting-templates)
-- Offsite backups are performed by [Arq Backup](https://www.arqbackup.com) which runs on the Mac Mini and performs nightly backups to B2. Backup restores are tested twice a year based on reminders in my to-do app. _This is NOT managed by this playbook._
+-   Most jobs use NFS storage on the NAS for volume mounts. Jobs who require their storage to be available on a local machine are backed up to the NAS using custom shell scripts which are called as pre/post tasks in their Nomad job file. These custom scripts are written using these [shell script templates](https://github.com/natelandau/shell-scripting-templates)
+-   Offsite backups are performed by [Arq Backup](https://www.arqbackup.com) which runs on the Mac Mini and performs nightly backups to B2. Backup restores are tested twice a year based on reminders in my to-do app. _This is NOT managed by this playbook._
 
 ## Service Architecture
 
-- [Hashicorp Consul](https://www.consul.io) provides a service mesh to allow intra-service discovery via DNS in the form of `[service_name].service.consul`.
-- [Hashicorp Nomad](https://www.nomadproject.io) provides container and service orchestration across all the RaspberryPis and the Mac Mini
-- [Traefik](https://traefik.io/traefik/) reverse proxies requests to services
-- [Authelia](https://www.authelia.com/) provides SSO
-- Traefik and Authelia are bundled in a single Nomad job named reverse_proxy.hcl
+-   [Hashicorp Consul](https://www.consul.io) provides a service mesh to allow intra-service discovery via DNS in the form of `[service_name].service.consul`.
+-   [Hashicorp Nomad](https://www.nomadproject.io) provides container and service orchestration across all the RaspberryPis and the Mac Mini
+-   [Traefik](https://traefik.io/traefik/) reverse proxies requests to services
+-   [Authelia](https://www.authelia.com/) provides SSO
+-   Traefik and Authelia are bundled in a single Nomad job named reverse_proxy.hcl
 
 ## Ansible Playbook
 
 This playbook adds storage, services, applications, and configurations to a previously bootstrapped server. Configuring server access, users, security, basic packages, generic networking, etc. is out of scope. Once a server is bootstrapped, this playbook will:
 
-- **Update servers**: Packages via Homebrew (MacOS) or apt (Debian)
-- **Configure shared storage**: Adds shared NFS/SMB storage from a NAS
-- **Installs and configures specific services** which run on bare metal
+-   **Update servers**: Packages via Homebrew (MacOS) or apt (Debian)
+-   **Configure shared storage**: Adds shared NFS/SMB storage from a NAS
+-   **Installs and configures specific services** which run on bare metal
 
-  - [Hashicorp Nomad](https://www.nomadproject.io) for service orchestration
-  - [Hashicorp Consul](https://www.consul.io) for a service mesh
-  - [Docker](https://www.docker.com) for containerization
-  - [Telegraf](https://www.influxdata.com/time-series-platform/telegraf/) for telemetry
-  - [Tdarr](https://tdarr.io) for automated video conversion
-  - Custom shell scripts for backups and house keeping
+    -   [Hashicorp Nomad](https://www.nomadproject.io) for service orchestration
+    -   [Hashicorp Consul](https://www.consul.io) for a service mesh
+    -   [Docker](https://www.docker.com) for containerization
+    -   [Telegraf](https://www.influxdata.com/time-series-platform/telegraf/) for telemetry
+    -   [Tdarr](https://tdarr.io) for automated video conversion
+    -   Custom shell scripts for backups and house keeping
 
-* **Syncs Nomad and Docker Compose job files** to servers:
-  - [ASN-to-IP](https://hub.docker.com/r/ddimick/asn-to-ip) - Used by Opnsense to build firewall aliases
-  - [Authelia](https://www.authelia.com/) - Open-source full-featured authentication server
-  - [Changedetection.io](https://github.com/dgtlmoon/changedetection.io) - Website change detection monitoring and notification service
-  - [Diun](https://crazymax.dev/diun/) - Docker Image Update Notifier is a CLI application
-  - [Grafana](https://grafana.com/) - Operational dashboards
-  - [Grafana Loki](https://grafana.com/oss/loki/) - Log aggregation system
-  - [Headless Trunk](https://github.com/alpeware/chrome-headless-trunk) - Headless Chromium
-  - [iCloud Drive Docker](https://github.com/mandarons/icloud-drive-docker) - Backup files and photos from Apple iCloud
-  - [InfluxDB](https://www.influxdata.com/) - Time series database
-  - [Lidarr](https://lidarr.audio/) - Music collection manager
-  - [Mealie](https://hay-kot.github.io/mealie/) - Recipe management
-  - [nginx](https://www.nginx.com/) - Web server
-  - [OpenVSCode Server](https://github.com/gitpod-io/openvscode-server) - Run VS Code on a remote machine
-  - [Overseerr](https://overseerr.dev/) - Media discovery and request management
-  - [Pi-Hole](https://pi-hole.net/) - Network-wide ad blocking
-  - [Plex](https://www.plex.tv/) - Media streaming
-  - [Promtail](https://grafana.com/docs/loki/latest/clients/promtail/) - Log shipping agent
-  - [Prowlarr](https://github.com/Prowlarr/Prowlarr) - Indexer manager/proxy
-  - [Radarr](https://radarr.video/) - Movie collection manager
-  - [sabNZBD](https://sabnzbd.org/) - Binary newsreader
-  - [Sonarr](https://sonarr.tv/) - TV collection manager
-  - [Syncthing](https://syncthing.net/) - Continuous file synchronization
-  - [Traefik](https://traefik.io/traefik/) - Reverse proxy
-  - [Uptime Kuma](https://github.com/louislam/uptime-kuma) - Monitoring tool
-  - [Whoogle](https://github.com/benbusby/whoogle-search) - Privacy-respecting metasearch engine
-  - [WikiJS](https://js.wiki/) - Powerful and extensible open source Wiki software
+*   **Syncs Nomad and Docker Compose job files** to servers:
+    -   [ASN-to-IP](https://hub.docker.com/r/ddimick/asn-to-ip) - Used by Opnsense to build firewall aliases
+    -   [Authelia](https://www.authelia.com/) - Open-source full-featured authentication server
+    -   [Changedetection.io](https://github.com/dgtlmoon/changedetection.io) - Website change detection monitoring and notification service
+    -   [Diun](https://crazymax.dev/diun/) - Docker Image Update Notifier is a CLI application
+    -   [Grafana](https://grafana.com/) - Operational dashboards
+    -   [Grafana Loki](https://grafana.com/oss/loki/) - Log aggregation system
+    -   [Headless Trunk](https://github.com/alpeware/chrome-headless-trunk) - Headless Chromium
+    -   [iCloud Drive Docker](https://github.com/mandarons/icloud-drive-docker) - Backup files and photos from Apple iCloud
+    -   [InfluxDB](https://www.influxdata.com/) - Time series database
+    -   [Lidarr](https://lidarr.audio/) - Music collection manager
+    -   [Mealie](https://hay-kot.github.io/mealie/) - Recipe management
+    -   [nginx](https://www.nginx.com/) - Web server
+    -   [OpenVSCode Server](https://github.com/gitpod-io/openvscode-server) - Run VS Code on a remote machine
+    -   [Overseerr](https://overseerr.dev/) - Media discovery and request management
+    -   [Pi-Hole](https://pi-hole.net/) - Network-wide ad blocking
+    -   [Plex](https://www.plex.tv/) - Media streaming
+    -   [Promtail](https://grafana.com/docs/loki/latest/clients/promtail/) - Log shipping agent
+    -   [Prowlarr](https://github.com/Prowlarr/Prowlarr) - Indexer manager/proxy
+    -   [Radarr](https://radarr.video/) - Movie collection manager
+    -   [sabNZBD](https://sabnzbd.org/) - Binary newsreader
+    -   [Sonarr](https://sonarr.tv/) - TV collection manager
+    -   [Syncthing](https://syncthing.net/) - Continuous file synchronization
+    -   [Traefik](https://traefik.io/traefik/) - Reverse proxy
+    -   [Uptime Kuma](https://github.com/louislam/uptime-kuma) - Monitoring tool
+    -   [Whoogle](https://github.com/benbusby/whoogle-search) - Privacy-respecting metasearch engine
+    -   [WikiJS](https://js.wiki/) - Powerful and extensible open source Wiki software
 
 ## Running the playbook
 
@@ -74,9 +76,9 @@ This playbook adds storage, services, applications, and configurations to a prev
 
 ### Notes
 
-- Specify specific tags by appending `--tags [tag1],[tag2]`
-- Skip specific tags by using `--skip-tags [tag1],[tag2]`
-- To dry run use `--check --diff`
+-   Specify specific tags by appending `--tags [tag1],[tag2]`
+-   Skip specific tags by using `--skip-tags [tag1],[tag2]`
+-   To dry run use `--check --diff`
 
 ### Available Ansible Tags
 
@@ -104,8 +106,8 @@ The following tags are available in for this playbook
 
 Variables are contained in two different files
 
-- `inventory.yml` - Server specific flags
-- `default_variables.yml` - Primary variables files
+-   `inventory.yml` - Server specific flags
+-   `default_variables.yml` - Primary variables files
 
 Additionally, a task named `interpolated_variables.yml` creates variables which have different values based on logical checks.
 
@@ -154,10 +156,10 @@ mac_intel: false
 
 Contains the majority of configuration variables. Specifically,
 
-- Version numbers - Bump a version number for a service which doesn't pull from `latest`.
-- Storage mount points
-- Service configuration variables
-- Apt and Homebrew package lists
+-   Version numbers - Bump a version number for a service which doesn't pull from `latest`.
+-   Storage mount points
+-   Service configuration variables
+-   Apt and Homebrew package lists
 
 ## Additional Information
 
@@ -165,12 +167,18 @@ Contains the majority of configuration variables. Specifically,
 
 Nomad is used as the orchestration engine. The following conventions are used throughout the Nomad job files.
 
-- Nomad jobs are written in hcl and **contain jinja template variables**. _Important:_ These job files will not function until synced via Ansible
-- There are three types of variables within nomad jobs
-  - Jinja variables populated when Ansible syncs the jobs to disc.
-  - Nomad environment variables populated at runtime
-  - Nomad variables read from the node's Nomad configuration file
-- Templates stanzas
-  - Indented heredocs can be used using `value = <<-EOT` to analyses the lines in the sequence to find the one with the smallest number of leading spaces, and then trims that many spaces from the beginning of all of the lines.
-  - Nomad env variables or Consul key/values used in templates will reload jobs when configurations change dynamically
-- Tags in service stanzas integrate with Traefik via the Consul catalog
+-   Nomad jobs are written in hcl and **contain jinja template variables**. _Important:_ These job files will not function until synced via Ansible
+-   There are three types of variables within nomad jobs
+    -   Jinja variables populated when Ansible syncs the jobs to disc.
+    -   Nomad environment variables populated at runtime
+    -   Nomad variables read from the node's Nomad configuration file
+-   Templates stanzas
+    -   Indented heredocs can be used using `value = <<-EOT` to analyses the lines in the sequence to find the one with the smallest number of leading spaces, and then trims that many spaces from the beginning of all of the lines.
+    -   Nomad env variables or Consul key/values used in templates will reload jobs when configurations change dynamically
+-   Tags in service stanzas integrate with Traefik via the Consul catalog
+
+# Developing
+
+-   This repository makes use of the wonderful Python [pre-commit](https://pre-commit.com/) package. To install, run `pre-commit install --install-hooks`
+
+-   This repository uses [Commitizen](https://github.com/commitizen-tools/commitizen) to enforce conventional commits.
