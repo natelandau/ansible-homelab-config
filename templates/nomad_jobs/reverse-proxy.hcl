@@ -181,6 +181,12 @@ job "reverse-proxy" {
                       subject: "[Authelia] {title}"
                       startup_check_address: {{ my_email_address }}
 
+                  ntp:
+                    address: "time.cloudflare.com:123"
+                    version: 3
+                    max_desync: 3s
+                    disable_startup_check: true
+                    disable_failure: true
                   EOH
           }
 
