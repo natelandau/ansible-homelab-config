@@ -1,6 +1,6 @@
 ---
 # ---------------------------------- SOFTWARE VERSIONS
-authelia_version: 4.36.9
+authelia_version: 4.37.0
 consul_version: 1.13.2
 influxdb_version: 1.8.10
 nomad_version: 1.4.1
@@ -20,24 +20,24 @@ tdarr_webui_port: "8265"
 # ---------------------------------- DIRECTORIES FOR SERVICE LOCAL STORAGE
 # These folders must be created, even if empty, to allow mounting nomad local storage end-points
 service_localfs_dirs:
-  - influxdb
-  - lidarr
-  - prowlarr
-  - radarr
-  - sonarr
-  - uptimekuma
+    - influxdb
+    - lidarr
+    - prowlarr
+    - radarr
+    - sonarr
+    - uptimekuma
 
 # ---------------------------------- SHARED FILE STORAGE
 rpi_usb_drive_mount_point: /mnt/usbDrive
 rpi_localfs_service_storage: "{{ rpi_usb_drive_mount_point }}/docker"
 rpi_nfs_mount_point: /mnt
 rpi_nfs_mounts_list:
-  - { local: "{{ rpi_nfs_mount_point }}/pi-cluster", src: "10.0.30.6:/volume1/pi-cluster" }
-  - { local: "{{ rpi_nfs_mount_point }}/syncthing", src: "10.0.30.6:/volume1/syncthing" }
-  - { local: "{{ rpi_nfs_mount_point }}/media", src: "10.0.30.6:/volume1/media" }
-  - { local: "{{ rpi_nfs_mount_point }}/nate", src: "10.0.30.6:/volume1/nate" }
+    - { local: "{{ rpi_nfs_mount_point }}/pi-cluster", src: "10.0.30.6:/volume1/pi-cluster" }
+    - { local: "{{ rpi_nfs_mount_point }}/syncthing", src: "10.0.30.6:/volume1/syncthing" }
+    - { local: "{{ rpi_nfs_mount_point }}/media", src: "10.0.30.6:/volume1/media" }
+    - { local: "{{ rpi_nfs_mount_point }}/nate", src: "10.0.30.6:/volume1/nate" }
 rpi_nfs_mounts_remove:
-  - { local: "{{ rpi_nfs_mount_point }}/downloads", src: "10.0.30.6:/volume1/downloads" }
+    - { local: "{{ rpi_nfs_mount_point }}/downloads", src: "10.0.30.6:/volume1/downloads" }
 
 # mac_autofs_type is one of 'smb,nfs,afp'
 mac_autofs_type: smb
@@ -45,23 +45,23 @@ mac_localfs_service_storage: "/Users/{{ ansible_user }}/Library/docker"
 mac_storage_mount_point: /System/Volumes/Data/mnt
 mac_keep_alive_file: "{{ mac_storage_mount_point }}/pi-cluster/keepalive.txt"
 mac_nfs_mounts_list:
-  - { local: "{{ mac_storage_mount_point }}/pi-cluster", src: "10.0.0.6:/volume1/pi-cluster" }
-  - { local: "{{ mac_storage_mount_point }}/syncthing", src: "10.0.0.6:/volume1/syncthing" }
-  - { local: "{{ mac_storage_mount_point }}/media", src: "10.0.0.6:/volume1/media" }
-  - { local: "{{ mac_storage_mount_point }}/nate", src: "10.0.0.6:/volume1/nate" }
+    - { local: "{{ mac_storage_mount_point }}/pi-cluster", src: "10.0.0.6:/volume1/pi-cluster" }
+    - { local: "{{ mac_storage_mount_point }}/syncthing", src: "10.0.0.6:/volume1/syncthing" }
+    - { local: "{{ mac_storage_mount_point }}/media", src: "10.0.0.6:/volume1/media" }
+    - { local: "{{ mac_storage_mount_point }}/nate", src: "10.0.0.6:/volume1/nate" }
 
 # Add mounts to remove from auto_nfs to the dict below if needed
 mac_nfs_mounts_remove:
-  # - { local: "{{ mac_storage_mount_point }}/pi-cluster", src: "10.0.0.6:/volume1/pi-cluster" }
+    # - { local: "{{ mac_storage_mount_point }}/pi-cluster", src: "10.0.0.6:/volume1/pi-cluster" }
 
 mac_afp_or_smb_mounts_list:
-  - { local: "{{ mac_storage_mount_point }}/pi-cluster", src: "10.0.0.6:/pi-cluster" }
-  - { local: "{{ mac_storage_mount_point }}/syncthing", src: "10.0.0.6:/syncthing" }
-  - { local: "{{ mac_storage_mount_point }}/media", src: "10.0.0.6:/media" }
-  - { local: "{{ mac_storage_mount_point }}/nate", src: "10.0.0.6:/nate" }
+    - { local: "{{ mac_storage_mount_point }}/pi-cluster", src: "10.0.0.6:/pi-cluster" }
+    - { local: "{{ mac_storage_mount_point }}/syncthing", src: "10.0.0.6:/syncthing" }
+    - { local: "{{ mac_storage_mount_point }}/media", src: "10.0.0.6:/media" }
+    - { local: "{{ mac_storage_mount_point }}/nate", src: "10.0.0.6:/nate" }
 
 mac_afp_or_smb_mounts_remove:
-  # - { local: "{{ mac_storage_mount_point }}/pi-cluster", src: "10.0.0.6:/pi-cluster" }
+    # - { local: "{{ mac_storage_mount_point }}/pi-cluster", src: "10.0.0.6:/pi-cluster" }
 
 # ---------------------------------- SERVICE CONFIGURATION VARIABLES
 
@@ -81,83 +81,83 @@ mac_tdarr_file_location: "/Users/{{ ansible_user }}/Library/tdarr"
 # ---------------------------------- PACKAGES
 
 apt_packages_list:
-  - bc
-  - coreutils
-  - curl
-  - dnsutils
-  - exa
-  - fzf
-  - git
-  - git-extras
-  - htop
-  - iftop
-  - iotop
-  - iperf
-  - jq
-  - less
-  - lnav
-  - logrotate
-  - lsof
-  - nano
-  - net-tools
-  - nmap
-  - openssh-server
-  - p7zip-full
-  - python3-pip
-  - rsync
-  - shellcheck
-  - unzip
-  - wget
-  - yamllint
-  - zsh
+    - bc
+    - coreutils
+    - curl
+    - dnsutils
+    - exa
+    - fzf
+    - git
+    - git-extras
+    - htop
+    - iftop
+    - iotop
+    - iperf
+    - jq
+    - less
+    - lnav
+    - logrotate
+    - lsof
+    - nano
+    - net-tools
+    - nmap
+    - openssh-server
+    - p7zip-full
+    - python3-pip
+    - rsync
+    - shellcheck
+    - unzip
+    - wget
+    - yamllint
+    - zsh
 
 homebrew_package_list:
-  - ansible
-  - ansible-lint
-  - bash
-  - bash-completion
-  - bashdb
-  - bat
-  - bats-core
-  - coreutils
-  - diff-so-fancy
-  - exa
-  - ffmpeg
-  - findutils
-  - fping
-  - fzf
-  - gawk
-  - git
-  - git-extras
-  - git-flow
-  - gnu-sed
-  - gnu-tar
-  - gnutls
-  - gpg
-  - grep
-  - handbrake
-  - htop
-  - httpie
-  - iperf
-  - jq
-  - nano
-  - ncurses
-  - nmap
-  - openssl
-  - pandoc
-  - prettier
-  - readline
-  - shellcheck
-  - shfmt
-  - source-highlight
-  - sqlite
-  - ssh-copy-id
-  - tealdeer
-  - tree
-  - wget
-  - yamllint
-  - zsh
+    - ansible
+    - ansible-lint
+    - bash
+    - bash-completion
+    - bashdb
+    - bat
+    - bats-core
+    - coreutils
+    - diff-so-fancy
+    - exa
+    - ffmpeg
+    - findutils
+    - fping
+    - fzf
+    - gawk
+    - git
+    - git-extras
+    - git-flow
+    - gnu-sed
+    - gnu-tar
+    - gnutls
+    - gpg
+    - grep
+    - handbrake
+    - htop
+    - httpie
+    - iperf
+    - jq
+    - nano
+    - ncurses
+    - nmap
+    - openssl
+    - pandoc
+    - prettier
+    - readline
+    - shellcheck
+    - shfmt
+    - source-highlight
+    - sqlite
+    - ssh-copy-id
+    - tealdeer
+    - tree
+    - wget
+    - yamllint
+    - zsh
 
 homebrew_cask_install_dir: /Applications
 homebrew_casks_list:
-  - lingon-x
+    - lingon-x
