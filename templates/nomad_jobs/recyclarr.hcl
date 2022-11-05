@@ -38,7 +38,7 @@ job "recyclarr" {
       // user = "${meta.PUID}:${meta.PGID}"
       driver = "docker"
       config {
-          image    = "ghcr.io/recyclarr/recyclarr"
+          image    = "ghcr.io/recyclarr/recyclarr:2"
           hostname = "${NOMAD_TASK_NAME}"
           init     = true
           volumes  = [
