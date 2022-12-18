@@ -1,177 +1,177 @@
 ---
 all:
-  # Set all inventory-based vars to false. Override on specific hosts.
-  vars:
-    # Used to stagger cron jobs
-    cron_start_minute: "0"
-    # Run software which needs to run on a single device
-    is_cluster_leader: false
-    # Install and configure Consul
-    is_consul_client: false
-    # Run this server as a consul server
-    is_consul_server: false
-    # Install Docker compose and sync compose files
-    is_docker_compose_client: false
-    # Install and configure Nomad
-    is_nomad_client: false
-    # Run this server as a Nomad server
-    is_nomad_server: false
-    # Install Prometheus on this server
-    is_prometheus_node: false
-    # Install Telegraf on this server
-    is_telegraf_client: false
-    # Run this node as the Tdarr server
-    is_tdarr_server: false
-    # Run Tdarr client on this server
-    is_tdarr_node: false
-    # Mount NFS shared storage
-    is_shared_storage_client: false
-    # Manage apt-packages
-    manage_apt_packages_list: false
-    # Manage Homebrew (MacOS) packages
-    manage_homebrew_package_list: false
-    # If true, will always delete dir before syncing new jobs.  (run '--tags clean' )
-    clean_nomad_jobs: false
-    # Mac computer with an Arm chip
-    mac_arm: false
-    # Mac computer with an Intel chip
-    mac_intel: false
-  children:
-    lan:
-      children:
-        pis:
-          hosts:
-            rpi1:
-              ansible_host: 10.0.30.91
-              ansible_user: "{{ pi_username }}"
-              ansible_become_pass: "{{ pi_become_pass }}"
-              ansible_ssh_private_key_file: "{{ ssh_key_location }}/rpi1"
-              ansible_port: 22
-              cron_start_minute: "0"
-              is_consul_server: true
-              is_consul_client: true
-              is_nomad_server: true
-              is_nomad_client: true
-              is_cluster_leader: true
-              is_prometheus_node: true
-              is_telegraf_client: true
-              manage_apt_packages_list: true
-              ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
-            rpi2:
-              ansible_host: 10.0.30.92
-              ansible_user: "{{ pi_username }}"
-              ansible_become_pass: "{{ pi_become_pass }}"
-              ansible_ssh_private_key_file: "{{ ssh_key_location }}/rpi2"
-              ansible_port: 22
-              cron_start_minute: "10"
-              is_consul_server: true
-              is_consul_client: true
-              is_nomad_server: true
-              is_nomad_client: true
-              is_telegraf_client: true
-              manage_apt_packages_list: true
-              ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
-            rpi3:
-              ansible_host: 10.0.30.93
-              ansible_user: "{{ pi_username }}"
-              ansible_become_pass: "{{ pi_become_pass }}"
-              ansible_ssh_private_key_file: "{{ ssh_key_location }}/rpi3"
-              ansible_port: 22
-              cron_start_minute: "20"
-              is_consul_server: true
-              is_consul_client: true
-              is_nomad_server: true
-              is_nomad_client: true
-              is_telegraf_client: true
-              manage_apt_packages_list: true
-              ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
-            rpi4:
-              ansible_host: 10.0.30.94
-              ansible_user: "{{ pi_username }}"
-              ansible_become_pass: "{{ pi_become_pass }}"
-              ansible_ssh_private_key_file: "{{ ssh_key_location }}/rpi4"
-              ansible_port: 22
-              cron_start_minute: "30"
-              is_consul_server: false
-              is_consul_client: true
-              is_nomad_server: false
-              is_nomad_client: true
-              is_telegraf_client: true
-              manage_apt_packages_list: true
-              ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
-        macs:
-          hosts:
-            macmini:
-              ansible_host: 10.0.0.4
-              ansible_user: "{{ my_username }}"
-              ansible_become_pass: "{{ mac_become_pass }}"
-              ansible_ssh_private_key_file: "{{ ssh_key_location }}/macMini"
-              ansible_python_interpreter: "/usr/local/bin/python3"
-              ansible_port: 22
-              mac_intel: true
-              is_nomad_client: true
-              is_consul_client: true
-              is_telegraf_client: true
-              is_tdarr_server: true
-              is_tdarr_node: true
-              manage_homebrew_package_list: true
-              ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
-            imac:
-              ansible_host: 10.0.0.25
-              ansible_user: "{{ my_username }}"
-              ansible_become_pass: "{{ mac_become_pass }}"
-              ansible_ssh_private_key_file: "{{ ssh_key_location }}/imac"
-              ansible_python_interpreter: "/usr/local/bin/python3"
-              ansible_port: 22
-              mac_intel: true
-              manage_homebrew_package_list: true
-              is_tdarr_node: true
-              is_shared_storage_client: true
-              ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
-            skimmbook:
-              ansible_host: 10.0.0.21
-              ansible_user: "{{ my_username }}"
-              ansible_become_pass: "{{ mac_become_pass }}"
-              ansible_ssh_private_key_file: "{{ ssh_key_location }}/skimmbook"
-              ansible_python_interpreter: "/opt/homebrew/bin/python3"
-              ansible_port: 22
-              mac_arm: true
-              manage_homebrew_package_list: true
-              is_tdarr_node: true
-              is_shared_storage_client: true
-              ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
-            vpnmac:
-              ansible_host: 10.0.90.2
-              ansible_user: "{{ my_username }}"
-              ansible_become_pass: "{{ mac_become_pass }}"
-              ansible_ssh_private_key_file: "{{ ssh_key_location }}/skimmbook"
-              ansible_python_interpreter: "/opt/homebrew/bin/python3"
-              ansible_port: 22
-              mac_arm: true
-              manage_homebrew_package_list: true
-              is_tdarr_node: true
-              ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
-        nas:
-          hosts:
-            synology:
-              ansible_host: 10.0.0.6
-              synology_second_ip: 10.0.30.6
-              ansible_user: "{{ my_username }}"
-              ansible_become_pass: "{{ synology_become_pass }}"
-              ansible_ssh_private_key_file: "{{ ssh_key_location }}/synology"
-              ansible_port: 22
-              ansible_python_interpreter: /usr/local/bin/python3
-              is_consul_client: true
-              is_telegraf_client: true
-              is_docker_compose_client: true
-    # linode:
-    #   children:
-    #     linode-cluster:
-    #       hosts:
-    #         testbox:
-    #           ansible_host:
-    #           linode_private_ip:
-    #           ansible_user:
-    #           ansible_become_pass:
-    #           ansible_ssh_private_key_file: "{{ ssh_key_location }}/linode"
-    #           ansible_port:
+    # Set all inventory-based vars to false. Override on specific hosts.
+    vars:
+        # Used to stagger cron jobs
+        cron_start_minute: "0"
+        # Run software which needs to run on a single device
+        is_cluster_leader: false
+        # Install and configure Consul
+        is_consul_client: false
+        # Run this server as a consul server
+        is_consul_server: false
+        # Install Docker compose and sync compose files
+        is_docker_compose_client: false
+        # Install and configure Nomad
+        is_nomad_client: false
+        # Run this server as a Nomad server
+        is_nomad_server: false
+        # Install Prometheus on this server
+        is_prometheus_node: false
+        # Install Telegraf on this server
+        is_telegraf_client: false
+        # Run this node as the Tdarr server
+        is_tdarr_server: false
+        # Run Tdarr client on this server
+        is_tdarr_node: false
+        # Mount NFS shared storage
+        is_shared_storage_client: false
+        # Manage apt-packages
+        manage_apt_packages_list: false
+        # Manage Homebrew (MacOS) packages
+        manage_homebrew_package_list: false
+        # If true, will always delete dir before syncing new jobs.  (run '--tags clean' )
+        clean_nomad_jobs: false
+        # Mac computer with an Arm chip
+        mac_arm: false
+        # Mac computer with an Intel chip
+        mac_intel: false
+    children:
+        lan:
+            children:
+                pis:
+                    hosts:
+                        rpi1:
+                            ansible_host: 10.0.30.91
+                            ansible_user: "{{ pi_username }}"
+                            ansible_become_pass: "{{ pi_become_pass }}"
+                            ansible_ssh_private_key_file: "{{ ssh_key_location }}/rpi1"
+                            ansible_port: 22
+                            cron_start_minute: "0"
+                            is_consul_server: true
+                            is_consul_client: true
+                            is_nomad_server: true
+                            is_nomad_client: true
+                            is_cluster_leader: true
+                            is_prometheus_node: true
+                            is_telegraf_client: true
+                            manage_apt_packages_list: true
+                            ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
+                        rpi2:
+                            ansible_host: 10.0.30.92
+                            ansible_user: "{{ pi_username }}"
+                            ansible_become_pass: "{{ pi_become_pass }}"
+                            ansible_ssh_private_key_file: "{{ ssh_key_location }}/rpi2"
+                            ansible_port: 22
+                            cron_start_minute: "10"
+                            is_consul_server: true
+                            is_consul_client: true
+                            is_nomad_server: true
+                            is_nomad_client: true
+                            is_telegraf_client: true
+                            manage_apt_packages_list: true
+                            ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
+                        rpi3:
+                            ansible_host: 10.0.30.93
+                            ansible_user: "{{ pi_username }}"
+                            ansible_become_pass: "{{ pi_become_pass }}"
+                            ansible_ssh_private_key_file: "{{ ssh_key_location }}/rpi3"
+                            ansible_port: 22
+                            cron_start_minute: "20"
+                            is_consul_server: true
+                            is_consul_client: true
+                            is_nomad_server: true
+                            is_nomad_client: true
+                            is_telegraf_client: true
+                            manage_apt_packages_list: true
+                            ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
+                        rpi4:
+                            ansible_host: 10.0.30.94
+                            ansible_user: "{{ pi_username }}"
+                            ansible_become_pass: "{{ pi_become_pass }}"
+                            ansible_ssh_private_key_file: "{{ ssh_key_location }}/rpi4"
+                            ansible_port: 22
+                            cron_start_minute: "30"
+                            is_consul_server: false
+                            is_consul_client: true
+                            is_nomad_server: false
+                            is_nomad_client: true
+                            is_telegraf_client: true
+                            manage_apt_packages_list: true
+                            ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
+                macs:
+                    hosts:
+                        macmini:
+                            ansible_host: 10.0.0.4
+                            ansible_user: "{{ my_username }}"
+                            ansible_become_pass: "{{ mac_become_pass }}"
+                            ansible_ssh_private_key_file: "{{ ssh_key_location }}/macMini"
+                            ansible_python_interpreter: "/usr/local/bin/python3"
+                            ansible_port: 22
+                            mac_intel: true
+                            is_nomad_client: true
+                            is_consul_client: true
+                            is_telegraf_client: true
+                            is_tdarr_server: true
+                            is_tdarr_node: true
+                            manage_homebrew_package_list: true
+                            ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
+                        imac:
+                            ansible_host: 10.0.0.25
+                            ansible_user: "{{ my_username }}"
+                            ansible_become_pass: "{{ mac_become_pass }}"
+                            ansible_ssh_private_key_file: "{{ ssh_key_location }}/imac"
+                            ansible_python_interpreter: "/usr/local/bin/python3"
+                            ansible_port: 22
+                            mac_intel: true
+                            manage_homebrew_package_list: true
+                            is_tdarr_node: true
+                            is_shared_storage_client: true
+                            ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
+                        skimmbook:
+                            ansible_host: 10.0.0.21
+                            ansible_user: "{{ my_username }}"
+                            ansible_become_pass: "{{ mac_become_pass }}"
+                            ansible_ssh_private_key_file: "{{ ssh_key_location }}/skimmbook"
+                            ansible_python_interpreter: "/Users/natelandau/.pyenv/shims/python"
+                            ansible_port: 22
+                            mac_arm: true
+                            manage_homebrew_package_list: true
+                            is_tdarr_node: true
+                            is_shared_storage_client: true
+                            ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
+                        vpnmac:
+                            ansible_host: 10.0.90.2
+                            ansible_user: "{{ my_username }}"
+                            ansible_become_pass: "{{ mac_become_pass }}"
+                            ansible_ssh_private_key_file: "{{ ssh_key_location }}/skimmbook"
+                            ansible_python_interpreter: "/Users/natelandau/.pyenv/shims/python"
+                            ansible_port: 22
+                            mac_arm: true
+                            manage_homebrew_package_list: true
+                            is_tdarr_node: true
+                            ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
+                nas:
+                    hosts:
+                        synology:
+                            ansible_host: 10.0.0.6
+                            synology_second_ip: 10.0.30.6
+                            ansible_user: "{{ my_username }}"
+                            ansible_become_pass: "{{ synology_become_pass }}"
+                            ansible_ssh_private_key_file: "{{ ssh_key_location }}/synology"
+                            ansible_port: 22
+                            ansible_python_interpreter: /usr/local/bin/python3
+                            is_consul_client: true
+                            is_telegraf_client: true
+                            is_docker_compose_client: true
+        # linode:
+        #   children:
+        #     linode-cluster:
+        #       hosts:
+        #         testbox:
+        #           ansible_host:
+        #           linode_private_ip:
+        #           ansible_user:
+        #           ansible_become_pass:
+        #           ansible_ssh_private_key_file: "{{ ssh_key_location }}/linode"
+        #           ansible_port:
