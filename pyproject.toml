@@ -4,7 +4,7 @@
     name        = "ansible-homelab-config"
     packages    = [{ include = "ansible_homelab_config" }]
     readme      = "README.md"
-    version     = "0.1.0"
+    version     = "0.2.0"
 
     [tool.poetry.dependencies]
         ansible      = "^7.2.0"
@@ -23,7 +23,7 @@
     bump_message             = "bump(release): v$current_version → v$new_version"
     tag_format               = "v$version"
     update_changelog_on_bump = true
-    version                  = "0.1.0"
+    version                  = "0.2.0"
     version_files            = ["pyproject.toml:version"]
 
 [tool.poe.tasks]
