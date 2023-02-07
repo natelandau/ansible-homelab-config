@@ -1,12 +1,12 @@
 ---
 repos:
     - repo: "https://github.com/commitizen-tools/commitizen"
-      rev: v2.35.0
+      rev: v2.40.0
       hooks:
           - id: "commitizen"
 
     - repo: "https://github.com/pre-commit/pre-commit-hooks"
-      rev: v4.3.0
+      rev: v4.4.0
       hooks:
           - id: check-added-large-files
           - id: check-ast
@@ -31,19 +31,30 @@ repos:
             args: [--markdown-linebreak-ext=md]
 
     - repo: "https://github.com/adrienverge/yamllint.git"
-      rev: v1.28.0
+      rev: v1.29.0
       hooks:
           - id: yamllint
             files: \.(yaml|yml)$
             exclude: |
                 (?x)^(
                 \.cz|
-                vault
+                vault|
+                ./galaxy-roles
                 )\.(yaml|yml)$
             entry: yamllint --strict --config-file .yamllint.yml
 
     - repo: local
       hooks:
+          - id: vault-pre-commit
+            name: check unencrypted vault
+            entry: scripts/ansible-vault-precommit.sh
+            language: system
+
+          - id: stopwords
+            name: check stopwords
+            entry: scripts/stopwords.sh
+            language: system
+
           - id: ansible-lint
             name: running ansible-lint
             language: system
@@ -56,12 +67,6 @@ repos:
             language: system
             files: \.sh\.j2$
             entry: shellcheck -x --exclude=1009,1054,1056,1072,1073,1083,2001,2148
-
-          - id: "lint-shellscripts"
-            name: lint shellscripts
-            language: system
-            files: \.sh$
-            entry: shellcheck -x --exclude=2001,2148
 
           - id: "run-shellscripts-bats-tests"
             name: run bats unit tests

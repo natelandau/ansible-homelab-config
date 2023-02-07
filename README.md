@@ -45,6 +45,7 @@ This playbook adds storage, services, applications, and configurations to a prev
     -   [Authelia](https://www.authelia.com/) - Open-source full-featured authentication server
     -   [Changedetection.io](https://github.com/dgtlmoon/changedetection.io) - Website change detection monitoring and notification service
     -   [Diun](https://crazymax.dev/diun/) - Docker Image Update Notifier is a CLI application
+    -   [FreshRSS](https://freshrss.org/) - A containerized RSS reader
     -   [Grafana](https://grafana.com/) - Operational dashboards
     -   [Grafana Loki](https://grafana.com/oss/loki/) - Log aggregation system
     -   [Headless Trunk](https://github.com/alpeware/chrome-headless-trunk) - Headless Chromium
@@ -60,6 +61,8 @@ This playbook adds storage, services, applications, and configurations to a prev
     -   [Promtail](https://grafana.com/docs/loki/latest/clients/promtail/) - Log shipping agent
     -   [Prowlarr](https://github.com/Prowlarr/Prowlarr) - Indexer manager/proxy
     -   [Radarr](https://radarr.video/) - Movie collection manager
+    -   [Readarr](https://readarr.com/) - ebook collection manager
+    -   [Recyclarr](https://github.com/recyclarr/recyclarr) - Automatically sync TRaSH guides to your Sonarr and Radarr instances
     -   [sabNZBD](https://sabnzbd.org/) - Binary newsreader
     -   [Sonarr](https://sonarr.tv/) - TV collection manager
     -   [Syncthing](https://syncthing.net/) - Continuous file synchronization
@@ -67,6 +70,21 @@ This playbook adds storage, services, applications, and configurations to a prev
     -   [Uptime Kuma](https://github.com/louislam/uptime-kuma) - Monitoring tool
     -   [Whoogle](https://github.com/benbusby/whoogle-search) - Privacy-respecting metasearch engine
     -   [WikiJS](https://js.wiki/) - Powerful and extensible open source Wiki software
+
+## Install
+
+This repository should work on any computer with `ansible` installed.
+
+To ensure correct versioning, I run it in a virtual environment managed by [Poetry](https://python-poetry.org/). To run it in a virtual environment follow these steps:
+
+1. Ensure you have Python version >= 3.9 installed.
+2. Install poetry `pip3 install poetry`
+3. Clone this repository `git clone https://github.com/natelandau/ansible-homelab-config.git`
+4. Use your terminal and enter the repository directory. On Linux/MacOS this is `cd ansible-homelab-config`
+5. Type `poetry install`
+6. Type `poetry shell`
+
+Following these steps _should_ provision everything you need to get running.
 
 ## Running the playbook
 

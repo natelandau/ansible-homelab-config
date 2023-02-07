@@ -1,0 +1,37 @@
+[tool.poetry]
+    authors     = ["Nate Landau <github@natenate.org>"]
+    description = "Ansible scripts to configure my homelab"
+    name        = "ansible-homelab-config"
+    packages    = [{ include = "ansible_homelab_config" }]
+    readme      = "README.md"
+    version     = "0.1.0"
+
+    [tool.poetry.dependencies]
+        ansible      = "^7.2.0"
+        ansible-lint = { version = "^6.12.1", markers = "platform_system != 'Windows'" }
+        commitizen   = "^2.40.0"
+        poethepoet   = "^0.18.1"
+        pre-commit   = "^3.0.4"
+        python       = "^3.9"
+        yamllint     = "^1.29.0"
+
+[build-system]
+    build-backend = "poetry.core.masonry.api"
+    requires      = ["poetry-core"]
+
+[tool.commitizen]
+    bump_message             = "bump(release): v$current_version → v$new_version"
+    tag_format               = "v$version"
+    update_changelog_on_bump = true
+    version                  = "0.1.0"
+    version_files            = ["pyproject.toml:version"]
+
+[tool.poe.tasks]
+    [tool.poe.tasks.lint]
+        help = "Run linters"
+
+        [[tool.poe.tasks.lint.sequence]]
+            shell = "yamllint --strict --config-file .yamllint.yml tasks/ handlers/ main.yml inventory.yml default_variables.yml"
+
+        [[tool.poe.tasks.lint.sequence]]
+            shell = "ansible-lint --force-color --config-file .ansible-lint.yml"
