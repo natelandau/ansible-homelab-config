@@ -1,6 +1,6 @@
 ---
 # ---------------------------------- SOFTWARE VERSIONS
-authelia_version: 4.37.3
+authelia_version: 4.37.5
 consul_version: 1.14.2
 influxdb_version: 1.8.10
 nomad_version: 1.4.3
