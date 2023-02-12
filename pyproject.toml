@@ -27,11 +27,18 @@
     version_files            = ["pyproject.toml:version"]
 
 [tool.poe.tasks]
+    pb = """
+ansible-playbook
+    --vault-password-file .password_file
+    main.yml
+    -i inventory.yml
+    """
+
     [tool.poe.tasks.lint]
         help = "Run linters"
 
         [[tool.poe.tasks.lint.sequence]]
-            shell = "yamllint --strict --config-file .yamllint.yml tasks/ handlers/ main.yml inventory.yml default_variables.yml"
+            cmd = "yamllint --strict --config-file .yamllint.yml tasks/ handlers/ main.yml inventory.yml default_variables.yml"
 
         [[tool.poe.tasks.lint.sequence]]
-            shell = "ansible-lint --force-color --config-file .ansible-lint.yml"
+            cmd = "ansible-lint --force-color --config-file .ansible-lint.yml"
