@@ -12,7 +12,6 @@ exclude_paths:
     - vault.yml
 
 skip_list:
-    - command-instead-of-shell
     - name[template]
     - ignore-errors
     - meta-incorrect
@@ -21,10 +20,11 @@ skip_list:
     - role-name
     - unnamed-task
     - var-naming
-    - name[casing]
     - latest[git]
 
 warn_list:
     - experimental
     - risky-file-permissions
     - command-instead-of-module
+    - no-changed-when
+    - command-instead-of-shell
