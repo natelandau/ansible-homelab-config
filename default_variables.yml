@@ -3,7 +3,7 @@
 authelia_version: 4.37.5
 consul_version: 1.15.1
 influxdb_version: 1.8.10
-nomad_version: 1.5.0
+nomad_version: 1.4.6
 prometheus_verssion: 2.42.0
 speedtest_cli_version: 1.2.0
 tdarr_installer_version: 2.00.13

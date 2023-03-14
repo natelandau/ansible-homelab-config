@@ -206,9 +206,9 @@ plugin "raw_exec" {
 
 plugin "docker" {
   config {
-    allow_caps       = [ "ALL" ]
+    allow_caps       = ["chown", "net_raw"]
     allow_privileged = true
-
+    extra_labels = ["job_name"]
     volumes {
       enabled = true
     }

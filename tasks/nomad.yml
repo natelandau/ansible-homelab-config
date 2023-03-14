@@ -4,243 +4,243 @@
 
 - name: "Set variables needed to install Nomad"
   block:
-    - name: "set variable: check if we have a mounted USB drive (Debian)"
-      ansible.builtin.stat:
-        path: "{{ rpi_usb_drive_mount_point }}"
-      register: have_usb_drive
-      changed_when: false
-      when:
-        - ansible_os_family == 'Debian'
+      - name: "set variable: check if we have a mounted USB drive (Debian)"
+        ansible.builtin.stat:
+            path: "{{ rpi_usb_drive_mount_point }}"
+        register: have_usb_drive
+        changed_when: false
+        when:
+            - ansible_os_family == 'Debian'
 
-    - name: "set variable: Use USB drive for nomad /opt (Debian)"
-      ansible.builtin.set_fact:
-        nomad_opt_dir_location: "{{ rpi_usb_drive_mount_point }}/opt/nomad"
-      when:
-        - ansible_os_family == 'Debian'
-        - have_usb_drive.stat.exists
+      - name: "set variable: Use USB drive for nomad /opt (Debian)"
+        ansible.builtin.set_fact:
+            nomad_opt_dir_location: "{{ rpi_usb_drive_mount_point }}/opt/nomad"
+        when:
+            - ansible_os_family == 'Debian'
+            - have_usb_drive.stat.exists
 
-    - name: "set variable: Use root dist for nomad /opt (Debian)"
-      ansible.builtin.set_fact:
-        nomad_opt_dir_location: "/opt/nomad"
-      when:
-        - ansible_os_family == 'Debian'
-        - not have_usb_drive.stat.exists
+      - name: "set variable: Use root dist for nomad /opt (Debian)"
+        ansible.builtin.set_fact:
+            nomad_opt_dir_location: "/opt/nomad"
+        when:
+            - ansible_os_family == 'Debian'
+            - not have_usb_drive.stat.exists
 
-    - name: "set variable: Use ~/library for /opt files (macOSX)"
-      ansible.builtin.set_fact:
-        nomad_opt_dir_location: "/Users/{{ ansible_user }}/Library/nomad"
-      when:
-        - ansible_os_family == 'Darwin'
+      - name: "set variable: Use ~/library for /opt files (macOSX)"
+        ansible.builtin.set_fact:
+            nomad_opt_dir_location: "/Users/{{ ansible_user }}/Library/nomad"
+        when:
+            - ansible_os_family == 'Darwin'
 
-    - name: "set variable: Set Nomad download Binary (armv7l)"
-      ansible.builtin.set_fact:
-        nomad_download_file_uri: "https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_linux_arm.zip"
-      when:
-        - ansible_os_family == 'Debian'
-        - ansible_architecture == 'armv7l'
+      - name: "set variable: Set Nomad download Binary (armv7l)"
+        ansible.builtin.set_fact:
+            nomad_download_file_uri: "https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_linux_arm.zip"
+        when:
+            - ansible_os_family == 'Debian'
+            - ansible_architecture == 'armv7l'
 
-    - name: "set variable: Set Nomad download Binary (aarch64)"
-      ansible.builtin.set_fact:
-        nomad_download_file_uri: "https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_linux_arm64.zip"
-      when:
-        - ansible_os_family == 'Debian'
-        - ansible_architecture == 'aarch64'
+      - name: "set variable: Set Nomad download Binary (aarch64)"
+        ansible.builtin.set_fact:
+            nomad_download_file_uri: "https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_linux_arm64.zip"
+        when:
+            - ansible_os_family == 'Debian'
+            - ansible_architecture == 'aarch64'
 
-    - name: "set variable: Set Nomad download Binary (MacOSX)"
-      ansible.builtin.set_fact:
-        nomad_download_file_uri: "https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_darwin_amd64.zip"
-      when:
-        - mac_intel
+      - name: "set variable: Set Nomad download Binary (MacOSX)"
+        ansible.builtin.set_fact:
+            nomad_download_file_uri: "https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_darwin_amd64.zip"
+        when:
+            - mac_intel
 
-    - name: Assert that we can install Nomad
-      ansible.builtin.assert:
-        that:
-          - nomad_download_file_uri is defined
-          - nomad_opt_dir_location is defined
-        fail_msg: "Unable to install Nomad on this host"
+      - name: Assert that we can install Nomad
+        ansible.builtin.assert:
+            that:
+                - nomad_download_file_uri is defined
+                - nomad_opt_dir_location is defined
+            fail_msg: "Unable to install Nomad on this host"
 
 - name: "Create Nomad user and group (Debian)"
   when: ansible_os_family == 'Debian'
   block:
-    - name: "Ensure group 'nomad' exists (Debian)"
-      become: true
-      ansible.builtin.group:
-        name: nomad
-        state: present
+      - name: "Ensure group 'nomad' exists (Debian)"
+        become: true
+        ansible.builtin.group:
+            name: nomad
+            state: present
 
-    - name: "Add the user 'nomad' with group 'nomad' (Debian)"
-      become: true
-      ansible.builtin.user:
-        name: nomad
-        group: nomad
+      - name: "Add the user 'nomad' with group 'nomad' (Debian)"
+        become: true
+        ansible.builtin.user:
+            name: nomad
+            group: nomad
 
-    - name: "Add user 'nomad' to docker and sudo groups (Debian)"
-      become: true
-      ansible.builtin.user:
-        user: nomad
-        groups: docker,sudo
-        append: true
+      - name: "Add user 'nomad' to docker and sudo groups (Debian)"
+        become: true
+        ansible.builtin.user:
+            user: nomad
+            groups: docker,sudo
+            append: true
 
 - name: "Create Nomad /opt storage"
   block:
-    - name: "create {{ nomad_opt_dir_location }} directories"
-      become: true
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: directory
-        recurse: true
-        mode: 0755
-      loop:
-        - "{{ nomad_opt_dir_location }}/logs"
-        - "{{ nomad_opt_dir_location }}/plugins"
-        - "{{ nomad_opt_dir_location }}/certs"
+      - name: "create {{ nomad_opt_dir_location }} directories"
+        become: true
+        ansible.builtin.file:
+            path: "{{ item }}"
+            state: directory
+            recurse: true
+            mode: 0755
+        loop:
+            - "{{ nomad_opt_dir_location }}/logs"
+            - "{{ nomad_opt_dir_location }}/plugins"
+            - "{{ nomad_opt_dir_location }}/certs"
 
-    - name: Copy server certs
-      become: true
-      ansible.builtin.copy:
-        src: "{{ item.src }}"
-        dest: "{{ item.dest }}"
-        mode: 0755
-      loop:
-        - { src: certs/nomad/nomad-ca.pem, dest: "{{ nomad_opt_dir_location }}/certs/nomad-ca.pem" }
-        - { src: certs/nomad/server.pem, dest: "{{ nomad_opt_dir_location }}/certs/server.pem" }
-        - { src: certs/nomad/server-key.pem, dest: "{{ nomad_opt_dir_location }}/certs/server-key.pem" }
-      notify: "restart nomad"
-      when: is_nomad_server
+      - name: Copy server certs
+        become: true
+        ansible.builtin.copy:
+            src: "{{ item.src }}"
+            dest: "{{ item.dest }}"
+            mode: 0755
+        loop:
+            - { src: certs/nomad/nomad-ca.pem, dest: "{{ nomad_opt_dir_location }}/certs/nomad-ca.pem" }
+            - { src: certs/nomad/server.pem, dest: "{{ nomad_opt_dir_location }}/certs/server.pem" }
+            - { src: certs/nomad/server-key.pem, dest: "{{ nomad_opt_dir_location }}/certs/server-key.pem" }
+        notify: "restart nomad"
+        when: is_nomad_server
 
-    - name: Copy client certs
-      become: true
-      ansible.builtin.copy:
-        src: "{{ item.src }}"
-        dest: "{{ item.dest }}"
-        mode: 0755
-      loop:
-        - { src: certs/nomad/nomad-ca.pem, dest: "{{ nomad_opt_dir_location }}/certs/nomad-ca.pem" }
-        - { src: certs/nomad/client.pem, dest: "{{ nomad_opt_dir_location }}/certs/client.pem" }
-        - { src: certs/nomad/client-key.pem, dest: "{{ nomad_opt_dir_location }}/certs/client-key.pem" }
-      notify: "restart nomad"
-      when: is_nomad_client
+      - name: Copy client certs
+        become: true
+        ansible.builtin.copy:
+            src: "{{ item.src }}"
+            dest: "{{ item.dest }}"
+            mode: 0755
+        loop:
+            - { src: certs/nomad/nomad-ca.pem, dest: "{{ nomad_opt_dir_location }}/certs/nomad-ca.pem" }
+            - { src: certs/nomad/client.pem, dest: "{{ nomad_opt_dir_location }}/certs/client.pem" }
+            - { src: certs/nomad/client-key.pem, dest: "{{ nomad_opt_dir_location }}/certs/client-key.pem" }
+        notify: "restart nomad"
+        when: is_nomad_client
 
-    - name: "set owner of files to nomad:nomad (debian)"
-      become: true
-      ansible.builtin.file:
-        path: "{{ nomad_opt_dir_location }}"
-        owner: nomad
-        group: nomad
-        recurse: true
-      when: ansible_os_family == 'Debian'
+      - name: "set owner of files to nomad:nomad (debian)"
+        become: true
+        ansible.builtin.file:
+            path: "{{ nomad_opt_dir_location }}"
+            owner: nomad
+            group: nomad
+            recurse: true
+        when: ansible_os_family == 'Debian'
 
-    - name: "set owner of files to {{ ansible_user_uid }}:{{ ansible_user_gid }} (MacOSX)"
-      become: true
-      ansible.builtin.file:
-        path: "{{ nomad_opt_dir_location }}"
-        owner: "{{ ansible_user_uid }}"
-        group: "{{ ansible_user_gid }}"
-        recurse: true
-      when: ansible_os_family != 'Debian'
+      - name: "set owner of files to {{ ansible_user_uid }}:{{ ansible_user_gid }} (MacOSX)"
+        become: true
+        ansible.builtin.file:
+            path: "{{ nomad_opt_dir_location }}"
+            owner: "{{ ansible_user_uid }}"
+            group: "{{ ansible_user_gid }}"
+            recurse: true
+        when: ansible_os_family != 'Debian'
 
 - name: "Template out the configuration file"
   block:
-    - name: "create {{ nomad_configuration_dir }}"
-      become: true
-      ansible.builtin.file:
-        path: "{{ nomad_configuration_dir }}"
-        state: directory
-        mode: 0755
+      - name: "create {{ nomad_configuration_dir }}"
+        become: true
+        ansible.builtin.file:
+            path: "{{ nomad_configuration_dir }}"
+            state: directory
+            mode: 0755
 
-    - name: copy base config file
-      become: true
-      ansible.builtin.template:
-        src: nomad.hcl.j2
-        dest: "{{ nomad_configuration_dir }}/nomad.hcl"
-        mode: 0644
-      notify: "restart nomad"
+      - name: copy base config file
+        become: true
+        ansible.builtin.template:
+            src: nomad.hcl.j2
+            dest: "{{ nomad_configuration_dir }}/nomad.hcl"
+            mode: 0644
+        notify: "restart nomad"
 
-    - name: "set owner of files to nomad:nomad (Debian)"
-      become: true
-      ansible.builtin.file:
-        path: "{{ nomad_configuration_dir }}"
-        owner: nomad
-        group: nomad
-        recurse: true
-      when:
-        - ansible_os_family == 'Debian'
+      - name: "set owner of files to nomad:nomad (Debian)"
+        become: true
+        ansible.builtin.file:
+            path: "{{ nomad_configuration_dir }}"
+            owner: nomad
+            group: nomad
+            recurse: true
+        when:
+            - ansible_os_family == 'Debian'
 
 - name: Install or Update Nomad
   block:
-    - name: "set fact: do we need a nomad install?"
-      ansible.builtin.set_fact:
-        need_nomad_install: false
+      - name: "set fact: do we need a nomad install?"
+        ansible.builtin.set_fact:
+            need_nomad_install: false
 
-    - name: Check if nomad is installed
-      ansible.builtin.stat:
-        path: /usr/local/bin/nomad
-      register: nomad_binary_file_location
+      - name: Check if nomad is installed
+        ansible.builtin.stat:
+            path: /usr/local/bin/nomad
+        register: nomad_binary_file_location
 
-    - name: "set fact: do we need a nomad install"
-      ansible.builtin.set_fact:
-        need_nomad_install: true
-      when:
-        - not nomad_binary_file_location.stat.exists
+      - name: "set fact: do we need a nomad install"
+        ansible.builtin.set_fact:
+            need_nomad_install: true
+        when:
+            - not nomad_binary_file_location.stat.exists
 
-    - name: Check current version of Nomad
-      ansible.builtin.shell: /usr/local/bin/nomad --version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+'
-      ignore_errors: true
-      register: current_nomad_version
-      check_mode: false
-      changed_when: false
-      when:
-        - not need_nomad_install
+      - name: Check current version of Nomad
+        ansible.builtin.shell: /usr/local/bin/nomad --version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+'
+        ignore_errors: true
+        register: current_nomad_version
+        check_mode: false
+        changed_when: false
+        when:
+            - not need_nomad_install
 
-    - name: "set fact: do we need a nomad install"
-      ansible.builtin.set_fact:
-        need_nomad_install: true
-      when:
-        - not need_nomad_install
-        - current_nomad_version.stdout is version(nomad_version, '<')
+      - name: "set fact: do we need a nomad install"
+        ansible.builtin.set_fact:
+            need_nomad_install: true
+        when:
+            - not need_nomad_install
+            - current_nomad_version.stdout is version(nomad_version, '<')
 
-    - name: install Nomad
-      become: true
-      ansible.builtin.unarchive:
-        src: "{{ nomad_download_file_uri }}"
-        dest: /usr/local/bin
-        remote_src: true
-      notify: "restart nomad"
-      when:
-        - need_nomad_install
+      - name: install Nomad
+        become: true
+        ansible.builtin.unarchive:
+            src: "{{ nomad_download_file_uri }}"
+            dest: /usr/local/bin
+            remote_src: true
+        notify: "restart nomad"
+        when:
+            - need_nomad_install
 
 - name: "Copy system.d or launchctrl service files"
   block:
-    - name: ensure /Library/LaunchAgents exists (MacOSX)
-      ansible.builtin.file:
-        path: "{{ nomad_plist_macos | dirname }}"
-        state: directory
-        mode: 0755
-      when:
-        - ansible_os_family == 'Darwin'
+      - name: ensure /Library/LaunchAgents exists (MacOSX)
+        ansible.builtin.file:
+            path: "{{ nomad_plist_macos | dirname }}"
+            state: directory
+            mode: 0755
+        when:
+            - ansible_os_family == 'Darwin'
 
-    - name: create nomad launchd service (MacOSX)
-      ansible.builtin.template:
-        src: nomad.launchd.j2
-        dest: "{{ nomad_plist_macos }}"
-        mode: 0644
-      notify: "restart nomad"
-      when:
-        - ansible_os_family == 'Darwin'
+      - name: create nomad launchd service (MacOSX)
+        ansible.builtin.template:
+            src: nomad.launchd.j2
+            dest: "{{ nomad_plist_macos }}"
+            mode: 0644
+        notify: "restart nomad"
+        when:
+            - ansible_os_family == 'Darwin'
 
-    - name: create nomad service (Debian)
-      become: true
-      ansible.builtin.template:
-        src: nomad.service.j2
-        dest: /etc/systemd/system/nomad.service
-        mode: 0644
-      notify: "restart nomad"
-      when:
-        - ansible_os_family == 'Debian'
+      - name: create nomad service (Debian)
+        become: true
+        ansible.builtin.template:
+            src: nomad.service.j2
+            dest: /etc/systemd/system/nomad.service
+            mode: 0644
+        notify: "restart nomad"
+        when:
+            - ansible_os_family == 'Debian'
 
 - name: "start nomad, if stopped"
   ansible.builtin.shell:
-    cmd: "/usr/local/bin/nomad node status -self -short | grep {{ inventory_hostname }}"
+      cmd: "/usr/local/bin/nomad node status -self -short | grep {{ inventory_hostname }}"
   register: node_status_response
   ignore_errors: true
   failed_when: false
