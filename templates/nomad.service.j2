@@ -7,9 +7,16 @@ ConditionFileNotEmpty={{ nomad_configuration_dir }}/nomad.hcl
 
 [Service]
 {# {% if 'linode' in group_names %} #}
-User=nomad
-Group=nomad
+{# User=nomad #}
+{# Group=nomad #}
 {# {% endif %} #}
+
+{# NOTE: Nomad is running as root rather than the Nomad user due to the Docker driver not being started when cgroups v2 are enabled.
+
+https://github.com/hashicorp/nomad/pull/16063
+ #}
+User=root
+Group=root
 ExecReload=/bin/kill -HUP $MAINPID
 ExecStart=/usr/local/bin/nomad agent -config {{ nomad_configuration_dir }}
 KillMode=process
