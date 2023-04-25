@@ -5,36 +5,37 @@
 
 - name: "Check if pull_all_repos exists"
   ansible.builtin.stat:
-    path: "~/bin/pull_all_repos"
+      path: "~/bin/pull_all_repos"
   check_mode: false
   register: pull_script_check
 
 - name: "Check if ~/repos exists"
   ansible.builtin.stat:
-    path: "~/repos"
+      path: "~/repos"
   check_mode: false
   register: repos_directory_check
 
-- name: "run pull_all_repos script"
+- name: "Run pull_all_repos script"
   ansible.builtin.command:
-    cmd: "~/bin/pull_all_repos --directory ~/repos"
+      cmd: "~/bin/pull_all_repos --directory ~/repos"
   register: pull_script_output
   when:
-    - not ansible_check_mode
-    - pull_script_check.stat.exists
-    - pull_script_check.stat.executable
-    - repos_directory_check.stat.isdir is defined
-    - repos_directory_check.stat.isdir
-    - repos_directory_check.stat.writeable
+      - not ansible_check_mode
+      - pull_script_check.stat.exists
+      - pull_script_check.stat.executable
+      - repos_directory_check.stat.isdir is defined
+      - repos_directory_check.stat.isdir
+      - repos_directory_check.stat.writeable
   failed_when: pull_script_output.rc > 1
+  changed_when: pull_script_output.rc == 0
 
 - name: "Output from pull_all_repos"
   ansible.builtin.debug:
-    msg: "{{ pull_script_output.stdout }}"
+      msg: "{{ pull_script_output.stdout }}"
   when:
-    - not ansible_check_mode
-    - pull_script_check.stat.exists
-    - pull_script_check.stat.executable
-    - repos_directory_check.stat.isdir is defined
-    - repos_directory_check.stat.isdir
-    - repos_directory_check.stat.writeable
+      - not ansible_check_mode
+      - pull_script_check.stat.exists
+      - pull_script_check.stat.executable
+      - repos_directory_check.stat.isdir is defined
+      - repos_directory_check.stat.isdir
+      - repos_directory_check.stat.writeable

@@ -4,7 +4,7 @@
 
 - name: "Set variables needed to install Nomad"
   block:
-      - name: "set variable: check if we have a mounted USB drive (Debian)"
+      - name: "Set variable: check if we have a mounted USB drive (Debian)"
         ansible.builtin.stat:
             path: "{{ rpi_usb_drive_mount_point }}"
         register: have_usb_drive
@@ -12,41 +12,41 @@
         when:
             - ansible_os_family == 'Debian'
 
-      - name: "set variable: Use USB drive for nomad /opt (Debian)"
+      - name: "Set variable: Use USB drive for nomad /opt (Debian)"
         ansible.builtin.set_fact:
             nomad_opt_dir_location: "{{ rpi_usb_drive_mount_point }}/opt/nomad"
         when:
             - ansible_os_family == 'Debian'
             - have_usb_drive.stat.exists
 
-      - name: "set variable: Use root dist for nomad /opt (Debian)"
+      - name: "Set variable: Use root dist for nomad /opt (Debian)"
         ansible.builtin.set_fact:
             nomad_opt_dir_location: "/opt/nomad"
         when:
             - ansible_os_family == 'Debian'
             - not have_usb_drive.stat.exists
 
-      - name: "set variable: Use ~/library for /opt files (macOSX)"
+      - name: "Set variable: Use ~/library for /opt files (macOSX)"
         ansible.builtin.set_fact:
             nomad_opt_dir_location: "/Users/{{ ansible_user }}/Library/nomad"
         when:
             - ansible_os_family == 'Darwin'
 
-      - name: "set variable: Set Nomad download Binary (armv7l)"
+      - name: "Set variable: Set Nomad download Binary (armv7l)"
         ansible.builtin.set_fact:
             nomad_download_file_uri: "https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_linux_arm.zip"
         when:
             - ansible_os_family == 'Debian'
             - ansible_architecture == 'armv7l'
 
-      - name: "set variable: Set Nomad download Binary (aarch64)"
+      - name: "Set variable: Set Nomad download Binary (aarch64)"
         ansible.builtin.set_fact:
             nomad_download_file_uri: "https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_linux_arm64.zip"
         when:
             - ansible_os_family == 'Debian'
             - ansible_architecture == 'aarch64'
 
-      - name: "set variable: Set Nomad download Binary (MacOSX)"
+      - name: "Set variable: Set Nomad download Binary (MacOSX)"
         ansible.builtin.set_fact:
             nomad_download_file_uri: "https://releases.hashicorp.com/nomad/{{ nomad_version }}/nomad_{{ nomad_version }}_darwin_amd64.zip"
         when:
@@ -83,7 +83,7 @@
 
 - name: "Create Nomad /opt storage"
   block:
-      - name: "create {{ nomad_opt_dir_location }} directories"
+      - name: "Create {{ nomad_opt_dir_location }} directories"
         become: true
         ansible.builtin.file:
             path: "{{ item }}"
@@ -121,7 +121,7 @@
         notify: "restart nomad"
         when: is_nomad_client
 
-      - name: "set owner of files to nomad:nomad (debian)"
+      - name: "Set owner of files to nomad:nomad (debian)"
         become: true
         ansible.builtin.file:
             path: "{{ nomad_opt_dir_location }}"
@@ -130,7 +130,7 @@
             recurse: true
         when: ansible_os_family == 'Debian'
 
-      - name: "set owner of files to {{ ansible_user_uid }}:{{ ansible_user_gid }} (MacOSX)"
+      - name: "Set owner of files to {{ ansible_user_uid }}:{{ ansible_user_gid }} (MacOSX)"
         become: true
         ansible.builtin.file:
             path: "{{ nomad_opt_dir_location }}"
@@ -141,14 +141,14 @@
 
 - name: "Template out the configuration file"
   block:
-      - name: "create {{ nomad_configuration_dir }}"
+      - name: "Create {{ nomad_configuration_dir }}"
         become: true
         ansible.builtin.file:
             path: "{{ nomad_configuration_dir }}"
             state: directory
             mode: 0755
 
-      - name: copy base config file
+      - name: Copy base config file
         become: true
         ansible.builtin.template:
             src: nomad.hcl.j2
@@ -156,7 +156,7 @@
             mode: 0644
         notify: "restart nomad"
 
-      - name: "set owner of files to nomad:nomad (Debian)"
+      - name: "Set owner of files to nomad:nomad (Debian)"
         become: true
         ansible.builtin.file:
             path: "{{ nomad_configuration_dir }}"
@@ -168,7 +168,7 @@
 
 - name: Install or Update Nomad
   block:
-      - name: "set fact: do we need a nomad install?"
+      - name: "Set fact: do we need a nomad install?"
         ansible.builtin.set_fact:
             need_nomad_install: false
 
@@ -177,7 +177,7 @@
             path: /usr/local/bin/nomad
         register: nomad_binary_file_location
 
-      - name: "set fact: do we need a nomad install"
+      - name: "Set fact: do we need a nomad install"
         ansible.builtin.set_fact:
             need_nomad_install: true
         when:
@@ -192,14 +192,14 @@
         when:
             - not need_nomad_install
 
-      - name: "set fact: do we need a nomad install"
+      - name: "Set fact: do we need a nomad install"
         ansible.builtin.set_fact:
             need_nomad_install: true
         when:
             - not need_nomad_install
             - current_nomad_version.stdout is version(nomad_version, '<')
 
-      - name: install Nomad
+      - name: Install Nomad
         become: true
         ansible.builtin.unarchive:
             src: "{{ nomad_download_file_uri }}"
@@ -211,7 +211,7 @@
 
 - name: "Copy system.d or launchctrl service files"
   block:
-      - name: ensure /Library/LaunchAgents exists (MacOSX)
+      - name: Ensure /Library/LaunchAgents exists (MacOSX)
         ansible.builtin.file:
             path: "{{ nomad_plist_macos | dirname }}"
             state: directory
@@ -219,7 +219,7 @@
         when:
             - ansible_os_family == 'Darwin'
 
-      - name: create nomad launchd service (MacOSX)
+      - name: Create nomad launchd service (MacOSX)
         ansible.builtin.template:
             src: nomad.launchd.j2
             dest: "{{ nomad_plist_macos }}"
@@ -228,7 +228,7 @@
         when:
             - ansible_os_family == 'Darwin'
 
-      - name: create nomad service (Debian)
+      - name: Create nomad service (Debian)
         become: true
         ansible.builtin.template:
             src: nomad.service.j2
@@ -238,7 +238,7 @@
         when:
             - ansible_os_family == 'Debian'
 
-- name: "start nomad, if stopped"
+- name: "Start nomad, if stopped"
   ansible.builtin.shell:
       cmd: "/usr/local/bin/nomad node status -self -short | grep {{ inventory_hostname }}"
   register: node_status_response

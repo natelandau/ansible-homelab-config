@@ -4,64 +4,64 @@
 
 - name: "Update and install APT packages"
   when:
-    - ansible_os_family != 'Darwin'
-    - manage_apt_packages_list
+      - ansible_os_family != 'Darwin'
+      - manage_apt_packages_list
   block:
-    - name: update APT package cache
-      become: true
-      ansible.builtin.apt:
-        update_cache: true
-        cache_valid_time: 3600
+      - name: Update APT package cache
+        become: true
+        ansible.builtin.apt:
+            update_cache: true
+            cache_valid_time: 3600
 
-    - name: "upgrade APT to the latest packages (this may take a while)"
-      become: true
-      ansible.builtin.apt:
-        upgrade: safe
+      - name: "Upgrade APT to the latest packages (this may take a while)"
+        become: true
+        ansible.builtin.apt:
+            upgrade: safe
 
-    - name: "install/upgrade APT packages (this may take a while)"
-      become: true
-      ansible.builtin.apt:
-        pkg: "{{ item }}"
-        state: present
-      loop: "{{ apt_packages_list }}"
-      register: apt_output
+      - name: "Install/upgrade APT packages (this may take a while)"
+        become: true
+        ansible.builtin.apt:
+            pkg: "{{ item }}"
+            state: present
+        loop: "{{ apt_packages_list }}"
+        register: apt_output
 
 - name: "Update and install Homebrew packages"
   when:
-    - manage_homebrew_package_list
-    - ansible_os_family == 'Darwin'
+      - manage_homebrew_package_list
+      - ansible_os_family == 'Darwin'
   block:
-    - name: upgrade homebrew and all packages
-      community.general.homebrew:
-        update_homebrew: true
-        upgrade_all: true
-      register: homebrew_output
-      ignore_errors: true
+      - name: Upgrade homebrew and all packages
+        community.general.homebrew:
+            update_homebrew: true
+            upgrade_all: true
+        register: homebrew_output
+        ignore_errors: true
 
-    - name: install base homebrew packages
-      community.general.homebrew:
-        name: "{{ homebrew_package_list | join(',') }}"
-        state: present
-        update_homebrew: false
-        upgrade_all: false
-      register: homebrew_output
+      - name: Install base homebrew packages
+        community.general.homebrew:
+            name: "{{ homebrew_package_list | join(',') }}"
+            state: present
+            update_homebrew: false
+            upgrade_all: false
+        register: homebrew_output
 
-    - name: homebrew packages updated or installed
-      ansible.builtin.debug:
-        msg: "{{ homebrew_output.changed_pkgs }}"
+      - name: Homebrew packages updated or installed
+        ansible.builtin.debug:
+            msg: "{{ homebrew_output.changed_pkgs }}"
 
-    - name: unchanged homebrew packages
-      ansible.builtin.debug:
-        msg: "{{ homebrew_output.unchanged_pkgs }}"
+      - name: Unchanged homebrew packages
+        ansible.builtin.debug:
+            msg: "{{ homebrew_output.unchanged_pkgs }}"
 
-    - name: install homebrew casks
-      community.general.homebrew_cask:
-        name: "{{ item }}"
-        state: present
-        install_options: "appdir=/Applications"
-        accept_external_apps: true
-        upgrade_all: false
-        update_homebrew: false
-        greedy: false
-      loop: "{{ homebrew_casks_list }}"
-      ignore_errors: true
+      - name: Install homebrew casks
+        community.general.homebrew_cask:
+            name: "{{ item }}"
+            state: present
+            install_options: "appdir=/Applications"
+            accept_external_apps: true
+            upgrade_all: false
+            update_homebrew: false
+            greedy: false
+        loop: "{{ homebrew_casks_list }}"
+        ignore_errors: true

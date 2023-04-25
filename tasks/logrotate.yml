@@ -4,29 +4,29 @@
 #
 # NOTE:  This task exists due to the arillso.logrotate failing completely on macOS
 
-- name: add service_backups.log to logrotate
+- name: Add service_backups.log to logrotate
   become: true
   vars:
-    logrotate_applications:
-      - name: service_backups
-        definitions:
-          - logs:
-              - "{{ rpi_nfs_mount_point }}/pi-cluster/logs/service_backups.log"
-            options:
-              - rotate 1
-              - size 100k
-              - missingok
-              - notifempty
-              - su root root
-              - extension .log
-              - compress
-              - nodateext
-              - nocreate
-              - delaycompress
+      logrotate_applications:
+          - name: service_backups
+            definitions:
+                - logs:
+                      - "{{ rpi_nfs_mount_point }}/pi-cluster/logs/service_backups.log"
+                  options:
+                      - rotate 1
+                      - size 100k
+                      - missingok
+                      - notifempty
+                      - su root root
+                      - extension .log
+                      - compress
+                      - nodateext
+                      - nocreate
+                      - delaycompress
   ansible.builtin.import_role:
-    name: arillso.logrotate
+      name: arillso.logrotate
   failed_when: false
   ignore_errors: true
   when:
-    - "'macs' not in group_names"
-    - is_cluster_leader
+      - "'macs' not in group_names"
+      - is_cluster_leader

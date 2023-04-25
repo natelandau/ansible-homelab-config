@@ -4,186 +4,187 @@
 
 - name: "Set variables"
   block:
-    - name: "Set tdarr local filesystem location (pis)"
-      ansible.builtin.set_fact:
-        interpolated_tdarr_dir: "{{ rpi1_tdarr_file_location }}"
-      changed_when: false
-      when:
-        - "'pis' in group_names"
+      - name: "Set tdarr local filesystem location (pis)"
+        ansible.builtin.set_fact:
+            interpolated_tdarr_dir: "{{ rpi1_tdarr_file_location }}"
+        changed_when: false
+        when:
+            - "'pis' in group_names"
 
-    - name: "Set tdarr local filesystem location (macs)"
-      ansible.builtin.set_fact:
-        interpolated_tdarr_dir: "{{ mac_tdarr_file_location }}"
-      changed_when: false
-      when:
-        - "'macs' in group_names"
+      - name: "Set tdarr local filesystem location (macs)"
+        ansible.builtin.set_fact:
+            interpolated_tdarr_dir: "{{ mac_tdarr_file_location }}"
+        changed_when: false
+        when:
+            - "'macs' in group_names"
 
-    - name: "set variable: Set tdarr download Binary (armv7l)"
-      ansible.builtin.set_fact:
-        tdarr_download_uri: "https://f000.backblazeb2.com/file/tdarrs/versions/{{ tdarr_installer_version }}/linux_arm/Tdarr_Updater.zip"
-      when:
-        - ansible_os_family == 'Debian'
-        - ansible_architecture == 'armv7l'
+      - name: "Set variable: Set tdarr download Binary (armv7l)"
+        ansible.builtin.set_fact:
+            tdarr_download_uri: "https://f000.backblazeb2.com/file/tdarrs/versions/{{ tdarr_installer_version }}/linux_arm/Tdarr_Updater.zip"
+        when:
+            - ansible_os_family == 'Debian'
+            - ansible_architecture == 'armv7l'
 
-    - name: "set variable: Set tdarr download Binary (MacOSX) - Intel"
-      ansible.builtin.set_fact:
-        tdarr_download_uri: "https://f000.backblazeb2.com/file/tdarrs/versions/{{ tdarr_installer_version }}/darwin_x64/Tdarr_Updater.zip"
-      when:
-        - mac_intel
+      - name: "Set variable: Set tdarr download Binary (MacOSX) - Intel"
+        ansible.builtin.set_fact:
+            tdarr_download_uri: "https://f000.backblazeb2.com/file/tdarrs/versions/{{ tdarr_installer_version }}/darwin_x64/Tdarr_Updater.zip"
+        when:
+            - mac_intel
 
-    - name: "set variable: Set tdarr download Binary (MacOSX) - ARM"
-      ansible.builtin.set_fact:
-        tdarr_download_uri: "https://f000.backblazeb2.com/file/tdarrs/versions/{{ tdarr_installer_version }}/darwin_arm64/Tdarr_Updater.zip"
-      when:
-        - mac_arm
+      - name: "Set variable: Set tdarr download Binary (MacOSX) - ARM"
+        ansible.builtin.set_fact:
+            tdarr_download_uri: "https://f000.backblazeb2.com/file/tdarrs/versions/{{ tdarr_installer_version }}/darwin_arm64/Tdarr_Updater.zip"
+        when:
+            - mac_arm
 
-    - name: "set fact: do we need a tdarr install?"
-      ansible.builtin.set_fact:
-        need_tdarr_install: false
+      - name: "Set fact: do we need a tdarr install?"
+        ansible.builtin.set_fact:
+            need_tdarr_install: false
 
-    - name: Assert that we can install Tdarr
-      ansible.builtin.assert:
-        that:
-          - tdarr_download_uri is defined
-          - interpolated_tdarr_dir is defined
-        fail_msg: "Unable to install Tdarr on this host"
+      - name: Assert that we can install Tdarr
+        ansible.builtin.assert:
+            that:
+                - tdarr_download_uri is defined
+                - interpolated_tdarr_dir is defined
+            fail_msg: "Unable to install Tdarr on this host"
 
 - name: "Install ffmpeg and HandbrakeCLI"
   block:
-    - name: "ensure ffmpeg and handbrake are installed (Debian)"
-      become: true
-      ansible.builtin.apt:
-        pkg: "{{ item }}"
-        state: present
-      loop:
-        - ffmpeg
-        - handbrake
-      when: "'pis' in group_names"
+      - name: "Ensure ffmpeg and handbrake are installed (Debian)"
+        become: true
+        ansible.builtin.apt:
+            pkg: "{{ item }}"
+            state: present
+        loop:
+            - ffmpeg
+            - handbrake
+        when: "'pis' in group_names"
 
-    - name: "ensure ffmpeg and handbrake are installed (MacOS)"
-      community.general.homebrew:
-        name: "{{ item }}"
-        state: present
-        update_homebrew: false
-        upgrade_all: false
-      loop:
-        - ffmpeg
-        - handbrake
-      when: "'macs' in group_names"
+      - name: "Ensure ffmpeg and handbrake are installed (MacOS)"
+        community.general.homebrew:
+            name: "{{ item }}"
+            state: present
+            update_homebrew: false
+            upgrade_all: false
+        loop:
+            - ffmpeg
+            - handbrake
+        when: "'macs' in group_names"
 
-- name: "ensure tdarr directory exists"
+- name: "Ensure tdarr directory exists"
   become: true
   ansible.builtin.file:
-    path: "{{ interpolated_tdarr_dir }}"
-    mode: 0755
-    owner: "{{ ansible_user_uid }}"
-    group: "{{ ansible_user_gid }}"
-    state: directory
+      path: "{{ interpolated_tdarr_dir }}"
+      mode: 0755
+      owner: "{{ ansible_user_uid }}"
+      group: "{{ ansible_user_gid }}"
+      state: directory
 
 - name: "Install tdarr"
   block:
-    - name: "set_fact: need Tdarr install?"
-      ansible.builtin.stat:
-        path: "{{ interpolated_tdarr_dir }}/configs"
-      register: tdarr_exists
-      changed_when: false
-      failed_when: false
+      - name: "Set fact: need Tdarr install?"
+        ansible.builtin.stat:
+            path: "{{ interpolated_tdarr_dir }}/configs"
+        register: tdarr_exists
+        changed_when: false
+        failed_when: false
 
-    - name: "set fact: do we need a tdarr install?"
-      ansible.builtin.set_fact:
-        need_tdarr_install: true
-      when: not tdarr_exists.stat.exists
+      - name: "Set fact: do we need a tdarr install?"
+        ansible.builtin.set_fact:
+            need_tdarr_install: true
+        when: not tdarr_exists.stat.exists
 
-    - name: Download tdarr
-      ansible.builtin.unarchive:
-        src: "{{ tdarr_download_uri }}"
-        dest: "{{ interpolated_tdarr_dir }}"
-        remote_src: true
-      when: need_tdarr_install
+      - name: Download tdarr
+        ansible.builtin.unarchive:
+            src: "{{ tdarr_download_uri }}"
+            dest: "{{ interpolated_tdarr_dir }}"
+            remote_src: true
+        when: need_tdarr_install
 
-    - name: Did tdarr download?
-      ansible.builtin.stat:
-        path: "{{ interpolated_tdarr_dir }}/Tdarr_Updater"
-      register: tdarr_installer_exists
-      failed_when: not tdarr_installer_exists.stat.exists
-      when: need_tdarr_install
+      - name: Did tdarr download?
+        ansible.builtin.stat:
+            path: "{{ interpolated_tdarr_dir }}/Tdarr_Updater"
+        register: tdarr_installer_exists
+        failed_when: not tdarr_installer_exists.stat.exists
+        when: need_tdarr_install
 
-    - name: Ensure correct permissions on Tdarr_Updater
-      ansible.builtin.file:
-        path: "{{ interpolated_tdarr_dir }}/Tdarr_Updater"
-        mode: 0755
-      when: need_tdarr_install
+      - name: Ensure correct permissions on Tdarr_Updater
+        ansible.builtin.file:
+            path: "{{ interpolated_tdarr_dir }}/Tdarr_Updater"
+            mode: 0755
+        when: need_tdarr_install
 
-    - name: Install tdarr
-      ansible.builtin.command:
-        cmd: "{{ interpolated_tdarr_dir }}/Tdarr_Updater"
-      register: tdarr_install
-      failed_when: tdarr_install.rc > 0
-      when: need_tdarr_install
+      - name: Install tdarr
+        ansible.builtin.command:
+            cmd: "{{ interpolated_tdarr_dir }}/Tdarr_Updater"
+        register: tdarr_install
+        failed_when: tdarr_install.rc > 0
+        changed_when: tdarr_install.rc == 0
+        when: need_tdarr_install
 
-    - name: Ensure correct permissions on server/node executables
-      ansible.builtin.file:
-        path: "{{ interpolated_tdarr_dir }}/{{ item }}"
-        mode: 0755
-      loop:
-        - Tdarr_Server/Tdarr_Server
-        - Tdarr_Node/Tdarr_Node
-      when: need_tdarr_install
+      - name: Ensure correct permissions on server/node executables
+        ansible.builtin.file:
+            path: "{{ interpolated_tdarr_dir }}/{{ item }}"
+            mode: 0755
+        loop:
+            - Tdarr_Server/Tdarr_Server
+            - Tdarr_Node/Tdarr_Node
+        when: need_tdarr_install
 
-- name: "configure tdarr"
+- name: "Configure tdarr"
   block:
-    - name: update server configuration file
-      ansible.builtin.template:
-        src: Tdarr_Server_Config.json.j2
-        dest: "{{ interpolated_tdarr_dir }}/configs/Tdarr_Server_Config.json"
-        mode: 0644
-      when: is_tdarr_server
+      - name: Update server configuration file
+        ansible.builtin.template:
+            src: Tdarr_Server_Config.json.j2
+            dest: "{{ interpolated_tdarr_dir }}/configs/Tdarr_Server_Config.json"
+            mode: 0644
+        when: is_tdarr_server
 
-    - name: update node configuration file
-      ansible.builtin.template:
-        src: Tdarr_Node_Config.json.j2
-        dest: "{{ interpolated_tdarr_dir }}/configs/Tdarr_Node_Config.json"
-        mode: 0644
-      when: is_tdarr_node
+      - name: Update node configuration file
+        ansible.builtin.template:
+            src: Tdarr_Node_Config.json.j2
+            dest: "{{ interpolated_tdarr_dir }}/configs/Tdarr_Node_Config.json"
+            mode: 0644
+        when: is_tdarr_node
 
-    - name: check if consul is installed?
-      ansible.builtin.stat:
-        path: "{{ interpolated_consul_configuration_dir }}"
-      register: consul_installed
-      changed_when: false
-      failed_when: false
-      when:
-        - is_tdarr_server
+      - name: Check if consul is installed?
+        ansible.builtin.stat:
+            path: "{{ interpolated_consul_configuration_dir }}"
+        register: consul_installed
+        changed_when: false
+        failed_when: false
+        when:
+            - is_tdarr_server
 
-    - name: move consul service config into place
-      become: true
-      ansible.builtin.template:
-        src: consul_services/tdarr_service.json.j2
-        dest: "{{ interpolated_consul_configuration_dir }}/tdarr_service.json"
-        mode: 0644
-      when:
-        - is_tdarr_server
-        - consul_installed.stat.exists
+      - name: Move consul service config into place
+        become: true
+        ansible.builtin.template:
+            src: consul_services/tdarr_service.json.j2
+            dest: "{{ interpolated_consul_configuration_dir }}/tdarr_service.json"
+            mode: 0644
+        when:
+            - is_tdarr_server
+            - consul_installed.stat.exists
 
-    - name: Reload consul agent
-      ansible.builtin.uri:
-        url: "http://{{ ansible_host }}:8500/v1/agent/reload"
-        method: PUT
-        status_code: 200
-      ignore_errors: true
-      register: consul_agent_reload_http_response
-      failed_when: consul_agent_reload_http_response.status != 200
-      when:
-        - is_tdarr_server
-        - consul_installed.stat.exists
+      - name: Reload consul agent
+        ansible.builtin.uri:
+            url: "http://{{ ansible_host }}:8500/v1/agent/reload"
+            method: PUT
+            status_code: 200
+        ignore_errors: true
+        register: consul_agent_reload_http_response
+        failed_when: consul_agent_reload_http_response.status != 200
+        when:
+            - is_tdarr_server
+            - consul_installed.stat.exists
 
-    - name: debug when consul agent reload fails
-      ansible.builtin.debug:
-        var: consul_agent_reload_http_response.msg
-      when:
-        - is_tdarr_server
-        - consul_installed.stat.exists
-        - consul_agent_reload_http_response.status != 200
+      - name: Debug when consul agent reload fails
+        ansible.builtin.debug:
+            var: consul_agent_reload_http_response.msg
+        when:
+            - is_tdarr_server
+            - consul_installed.stat.exists
+            - consul_agent_reload_http_response.status != 200
 
-- name: mount shared storage
+- name: Mount shared storage
   ansible.builtin.import_tasks: cluster_storage.yml

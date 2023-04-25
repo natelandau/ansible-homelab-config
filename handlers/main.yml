@@ -3,80 +3,96 @@
 - name: Mount shared storage on Mac
   become: true
   ansible.builtin.command:
-    cmd: automount -cv
+      cmd: automount -cv
   register: automount_output
   failed_when: automount_output.rc > 0
+  changed_when: automount_output.rc == 0
   when:
-    - "'macs' in group_names"
-    - not ansible_check_mode
+      - "'macs' in group_names"
+      - not ansible_check_mode
   listen: "mac_run_automount"
 
 - name: Mount and unmount shared storage on Mac
   become: true
   ansible.builtin.command:
-    cmd: automount -cvu
+      cmd: automount -cvu
   register: automount_output
   failed_when: automount_output.rc > 0
+  changed_when: automount_output.rc == 0
   when:
-    - "'macs' in group_names"
-    - not ansible_check_mode
+      - "'macs' in group_names"
+      - not ansible_check_mode
   listen: "mac_run_automount_unmount"
 
 ##################################### TELEGRAF
 - name: (Re)Start telegraf (Debian)
   become: true
   ansible.builtin.service:
-    name: telegraf
-    state: restarted
+      name: telegraf
+      state: restarted
+  register: telegraf_service
+  failed_when: telegraf_service.rc > 0
+  changed_when: telegraf_service.rc == 0
   when:
-    - ansible_os_family == 'Debian'
+      - ansible_os_family == 'Debian'
   listen: restart_telegraf
 
 - name: (Re)Start telegraf
   ansible.builtin.shell:
-    cmd: /usr/local/bin/brew services restart telegraf
-    executable: /usr/local/bin/bash
+      cmd: /usr/local/bin/brew services restart telegraf
+      executable: /usr/local/bin/bash
   ignore_errors: true
+  register: telegraf_service
+  failed_when: telegraf_service.rc > 0
+  changed_when: telegraf_service.rc == 0
   when:
-    - ansible_os_family == 'Darwin'
+      - ansible_os_family == 'Darwin'
   listen: restart_telegraf
 
 ##################################### NOMAD
 
-- name: restart nomad (Debian)
+- name: Restart nomad (Debian)
   become: true
   ansible.builtin.systemd:
-    name: nomad
-    enabled: true
-    state: restarted
+      name: nomad
+      enabled: true
+      state: restarted
+  register: nomad_service
+  failed_when: nomad_service.rc > 0
+  changed_when: nomad_service.rc == 0
   when:
-    - ansible_os_family == 'Debian'
-    - "'nostart' not in ansible_run_tags"
+      - ansible_os_family == 'Debian'
+      - "'nostart' not in ansible_run_tags"
   listen: "restart nomad"
 
-- name: "unload nomad agent (MacOSX)"
+- name: "Unload nomad agent (MacOSX)"
   ansible.builtin.command:
-    cmd: "launchctl unload -w {{ nomad_plist_macos }}"
-  failed_when: false
+      cmd: "launchctl unload -w {{ nomad_plist_macos }}"
+  register: nomad_service
+  changed_when: nomad_service.rc == 0
+  failed_when: nomad_service.rc > 0
   when:
-    - ansible_os_family == 'Darwin'
-    - "'nostart' not in ansible_run_tags"
+      - ansible_os_family == 'Darwin'
+      - "'nostart' not in ansible_run_tags"
   listen: "restart nomad"
 
-- name: "load the nomad agent (MacOSX)"
+- name: "Load the nomad agent (MacOSX)"
   ansible.builtin.command:
-    cmd: "launchctl load -w {{ nomad_plist_macos }}"
+      cmd: "launchctl load -w {{ nomad_plist_macos }}"
+  register: nomad_service
+  changed_when: nomad_service.rc == 0
+  failed_when: nomad_service.rc > 0
   when:
-    - ansible_os_family == 'Darwin'
-    - "'nostart' not in ansible_run_tags"
+      - ansible_os_family == 'Darwin'
+      - "'nostart' not in ansible_run_tags"
   listen: "restart nomad"
 
-- name: "ensure nomad is really running"
+- name: "Ensure nomad is really running"
   ansible.builtin.shell:
-    cmd: "sleep 10 && /usr/local/bin/nomad node status -self -short | grep {{ inventory_hostname }}"
+      cmd: "set -o pipefail && sleep 10 && /usr/local/bin/nomad node status -self -short | grep {{ inventory_hostname }}"
   register: node_status_response
   failed_when: node_status_response.rc > 0
-  changed_when: false
+  changed_when: node_status_response.rc == 0
   when: "'nostart' not in ansible_run_tags"
   listen: "restart nomad"
 # - name: "Ensure sure Nomad service is really running"

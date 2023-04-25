@@ -1,12 +1,12 @@
 ---
 # TASK DESCRIPTION:
 # Always runs fist.  Confirms we can actually use Ansible
-- name: sanity - user mode
+- name: Sanity - user mode
   become: false
   ansible.builtin.debug:
-    msg: "sanity check: user mode"
+      msg: "Sanity check: user mode"
 
-- name: sanity - become mode
+- name: Sanity - become mode
   become: true
   ansible.builtin.debug:
-    msg: "sanity check: become mode"
+      msg: "Sanity check: become mode"

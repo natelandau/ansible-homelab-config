@@ -4,85 +4,91 @@
 
 - name: Check if Docker is already present
   ansible.builtin.command:
-    cmd: docker --version
+      cmd: docker --version
   register: docker_command_result
   changed_when: docker_command_result.rc == 1
   failed_when: false
 
-- name: install docker on Debian
+- name: Install docker on Debian
   when: ansible_os_family == 'Debian'
   block:
-    - name: "Add docker local filesystem storage directory"
-      ansible.builtin.file:
-        path: "{{ rpi_localfs_service_storage }}"
-        mode: 0755
-        state: directory
+      - name: "Add docker local filesystem storage directory"
+        ansible.builtin.file:
+            path: "{{ rpi_localfs_service_storage }}"
+            mode: 0755
+            state: directory
 
-    - name: Download Docker install convenience script
-      ansible.builtin.get_url:
-        url: "https://get.docker.com/"
-        dest: /tmp/get-docker.sh
-        mode: 0775
-      when: docker_command_result.rc == 1
+      - name: Download Docker install convenience script
+        ansible.builtin.get_url:
+            url: "https://get.docker.com/"
+            dest: /tmp/get-docker.sh
+            mode: 0775
+        when: docker_command_result.rc == 1
 
-    - name: Run Docker install convenience script
-      ansible.builtin.command: /tmp/get-docker.sh
-      environment:
-        CHANNEL: stable
-      when: docker_command_result.rc == 1
+      - name: Run Docker install convenience script
+        ansible.builtin.command: /tmp/get-docker.sh
+        environment:
+            CHANNEL: stable
+        register: docker_install
+        failed_when: docker_install.rc > 0
+        changed_when: docker_install.rc == 0
+        when: docker_command_result.rc == 1
 
-    - name: Make sure Docker CE is the version specified
-      ansible.builtin.apt:
-        name: "docker-ce"
-        state: present
-      when: docker_command_result.rc == 1
+      - name: Make sure Docker CE is the version specified
+        ansible.builtin.apt:
+            name: "docker-ce"
+            state: present
+        when: docker_command_result.rc == 1
 
-    - name: Ensure Docker is started
-      ansible.builtin.service:
-        name: docker
-        state: started
-        enabled: true
+      - name: Ensure Docker is started
+        ansible.builtin.service:
+            name: docker
+            state: started
+            enabled: true
 
-    - name: Ensure docker users are added to the docker group
-      become: true
-      ansible.builtin.user:
-        name: "{{ ansible_user }}"
-        groups: docker
-        append: true
-      when: docker_command_result.rc == 1
+      - name: Ensure docker users are added to the docker group
+        become: true
+        ansible.builtin.user:
+            name: "{{ ansible_user }}"
+            groups: docker
+            append: true
+        when: docker_command_result.rc == 1
 
-- name: install docker on macOS
+- name: Install docker on macOS
   when: "'macs' in group_names"
   block:
-    - name: "Add docker directory to ~/Library"
-      ansible.builtin.file:
-        path: "{{ mac_localfs_service_storage }}"
-        mode: 0755
-        state: directory
+      - name: "Add docker directory to ~/Library"
+        ansible.builtin.file:
+            path: "{{ mac_localfs_service_storage }}"
+            mode: 0755
+            state: directory
 
-    - name: install base homebrew packages
-      community.general.homebrew:
-        name: docker
-        state: present
-        update_homebrew: false
-        upgrade_all: false
-      when: docker_command_result.rc == 1
+      - name: Install base homebrew packages
+        community.general.homebrew:
+            name: docker
+            state: present
+            update_homebrew: false
+            upgrade_all: false
+        when: docker_command_result.rc == 1
 
-    - name: open docker application
-      ansible.builtin.command:
-        cmd: open /Applications/Docker.app
-      when: docker_command_result.rc == 1
+      - name: Open docker application
+        ansible.builtin.command:
+            cmd: open /Applications/Docker.app
+        register: docker_open_app
+        failed_when: docker_open_app.rc > 0
+        changed_when: docker_open_app.rc == 0
+        when: docker_command_result.rc == 1
 
-    - name: Must install Docker manually
-      ansible.builtin.debug:
-        msg: |
-          Docker must be installed manually on MacOS. Log in to mac to install then rerun playbook
+      - name: Must install Docker manually
+        ansible.builtin.debug:
+            msg: |
+                Docker must be installed manually on MacOS. Log in to mac to install then rerun playbook
 
-          Be certain to configure the following:
-            - run on login
-            - add '{{ mac_storage_mount_point }}' to mountable file system directories
-      when: docker_command_result.rc == 1
+                Be certain to configure the following:
+                  - run on login
+                  - add '{{ mac_storage_mount_point }}' to mountable file system directories
+        when: docker_command_result.rc == 1
 
-    - name: end play
-      ansible.builtin.meta: end_play
-      when: docker_command_result.rc == 1
+      - name: End play
+        ansible.builtin.meta: end_play
+        when: docker_command_result.rc == 1

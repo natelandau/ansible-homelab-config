@@ -4,90 +4,92 @@
 #
 # NOTE: This is depreciated, I no longer use Prometheus and have migrated to Telegraf
 
-- name: populate service facts
+- name: Populate service facts
   ansible.builtin.service_facts:
 
-- name: stop node_exporter
+- name: Stop node_exporter
   become: true
   ansible.builtin.systemd:
-    name: node_exporter
-    state: stopped
+      name: node_exporter
+      state: stopped
   when: ansible_facts.services["node_exporter.service"] is defined
 
 - name: Ensure group "prometheus" exists
   become: true
   ansible.builtin.group:
-    name: prometheus
-    state: present
+      name: prometheus
+      state: present
 
 - name: Add the user 'prometheus' with group 'prometheus'
   become: true
   ansible.builtin.user:
-    name: prometheus
-    group: prometheus
-    groups: docker
-    append: true
+      name: prometheus
+      group: prometheus
+      groups: docker
+      append: true
 
 # --------------- Install or Update Prometheus
-- name: "set fact: need to install Prometheus?"
+- name: "Set fact: need to install Prometheus?"
   ansible.builtin.set_fact:
-    need_prometheus_install: false
+      need_prometheus_install: false
 
 - name: Check if node_exporter is installed
   ansible.builtin.stat:
-    path: /usr/local/bin/node_exporter
+      path: /usr/local/bin/node_exporter
   register: prometheus_binary_file_location
 
-- name: "set fact: need to install Prometheus?"
+- name: "Set fact: need to install Prometheus?"
   ansible.builtin.set_fact:
-    need_prometheus_install: true
+      need_prometheus_install: true
   when:
-    - not prometheus_binary_file_location.stat.exists
+      - not prometheus_binary_file_location.stat.exists
 
 - name: Check current version of Prometheus
   ansible.builtin.shell: /usr/local/bin/node_exporter --version 3>&1 1>&2 2>&3 | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+'
   ignore_errors: true
   register: current_prometheus_version
+  failed_when: false
+  changed_when: false
   check_mode: false
   when:
-    - need_prometheus_install is false
+      - need_prometheus_install is false
 
-- name: "set fact: need to install Prometheus?"
+- name: "Set fact: need to install Prometheus?"
   ansible.builtin.set_fact:
-    need_prometheus_install: true
+      need_prometheus_install: true
   when:
-    - need_prometheus_install is false
-    - current_prometheus_version.stdout != prometheus_verssion
+      - need_prometheus_install is false
+      - current_prometheus_version.stdout != prometheus_verssion
 
-- name: install node_exporter
+- name: Install node_exporter
   become: true
   ansible.builtin.unarchive:
-    src: "https://github.com/prometheus/node_exporter/releases/download/v{{ prometheus_verssion }}/node_exporter-{{ prometheus_verssion }}.linux-armv7.tar.gz"
-    dest: /usr/local/bin
-    group: prometheus
-    owner: prometheus
-    # reference for extra_opts: https://github.com/ansible/ansible/issues/27081
-    extra_opts:
-      - --strip=1
-      - --no-anchored
-      - "node_exporter"
-    remote_src: true
+      src: "https://github.com/prometheus/node_exporter/releases/download/v{{ prometheus_verssion }}/node_exporter-{{ prometheus_verssion }}.linux-armv7.tar.gz"
+      dest: /usr/local/bin
+      group: prometheus
+      owner: prometheus
+      # reference for extra_opts: https://github.com/ansible/ansible/issues/27081
+      extra_opts:
+          - --strip=1
+          - --no-anchored
+          - "node_exporter"
+      remote_src: true
   when:
-    - need_prometheus_install is true
+      - need_prometheus_install is true
 
-- name: create node_exporter service
+- name: Create node_exporter service
   become: true
   ansible.builtin.template:
-    src: node_exporter.service.j2
-    dest: /etc/systemd/system/node_exporter.service
-    mode: 0644
+      src: node_exporter.service.j2
+      dest: /etc/systemd/system/node_exporter.service
+      mode: 0644
 
-- name: start node_exporter
+- name: Start node_exporter
   become: true
   ansible.builtin.systemd:
-    name: node_exporter
-    daemon_reload: true
-    enabled: true
-    state: started
+      name: node_exporter
+      daemon_reload: true
+      enabled: true
+      state: started
   when:
-    - "'nostart' not in ansible_run_tags"
+      - "'nostart' not in ansible_run_tags"

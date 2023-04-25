@@ -1,7 +1,7 @@
 ---
 repos:
     - repo: "https://github.com/commitizen-tools/commitizen"
-      rev: v2.42.1
+      rev: 3.0.1
       hooks:
           - id: "commitizen"
 
@@ -31,7 +31,7 @@ repos:
             args: [--markdown-linebreak-ext=md]
 
     - repo: "https://github.com/adrienverge/yamllint.git"
-      rev: v1.29.0
+      rev: v1.31.0
       hooks:
           - id: yamllint
             files: \.(yaml|yml)$

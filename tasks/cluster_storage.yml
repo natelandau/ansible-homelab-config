@@ -6,159 +6,159 @@
 - name: "Mount storage on Raspberry Pis"
   when: "'pis' in group_names"
   block:
-    - name: ensure local mount points exist
-      become: true
-      ansible.builtin.file:
-        path: "{{ item.local }}"
-        state: directory
-        mode: 0777
-        # owner: "{{ ansible_user_uid }}"
-        # group: "{{ ansible_user_gid }}"
-      loop: "{{ rpi_nfs_mounts_list }}"
+      - name: Ensure local mount points exist
+        become: true
+        ansible.builtin.file:
+            path: "{{ item.local }}"
+            state: directory
+            mode: 0777
+            # owner: "{{ ansible_user_uid }}"
+            # group: "{{ ansible_user_gid }}"
+        loop: "{{ rpi_nfs_mounts_list }}"
 
-    - name: remove old nfs drives
-      become: true
-      ansible.posix.mount:
-        path: "{{ item.local }}"
-        src: "{{ item.src }}"
-        fstype: nfs
-        opts: defaults,hard,intr,timeo=14
-        state: absent
-      loop: "{{ rpi_nfs_mounts_remove }}"
+      - name: Remove old nfs drives
+        become: true
+        ansible.posix.mount:
+            path: "{{ item.local }}"
+            src: "{{ item.src }}"
+            fstype: nfs
+            opts: defaults,hard,intr,timeo=14
+            state: absent
+        loop: "{{ rpi_nfs_mounts_remove }}"
 
-    - name: mount all nfs drives
-      become: true
-      ansible.posix.mount:
-        path: "{{ item.local }}"
-        src: "{{ item.src }}"
-        fstype: nfs
-        opts: defaults,hard,intr,timeo=14
-        state: mounted
-        boot: true
-      loop: "{{ rpi_nfs_mounts_list }}"
+      - name: Mount all nfs drives
+        become: true
+        ansible.posix.mount:
+            path: "{{ item.local }}"
+            src: "{{ item.src }}"
+            fstype: nfs
+            opts: defaults,hard,intr,timeo=14
+            state: mounted
+            boot: true
+        loop: "{{ rpi_nfs_mounts_list }}"
 
 # --------------------------------- Mount on Macs
 #                                   https://gist.github.com/l422y/8697518
 - name: "Mount storage on Macs"
   when: "'macs' in group_names"
   block:
-    - name: create mount_point
-      become: true
-      ansible.builtin.file:
-        path: "{{ mac_storage_mount_point }}"
-        state: directory
-        mode: 0755
+      - name: Create mount_point
+        become: true
+        ansible.builtin.file:
+            path: "{{ mac_storage_mount_point }}"
+            state: directory
+            mode: 0755
 
-    # I ran into problems getting this to run successfully. If errors occur, add the line manually using:
-    #     $ sudo nano /private/etc/auto_master
+      # I ran into problems getting this to run successfully. If errors occur, add the line manually using:
+      #     $ sudo nano /private/etc/auto_master
 
-    - name: add NFS shared drives to macs
-      when: mac_autofs_type == 'nfs'
-      block:
-        - name: add auto_nfs to "/private/etc/auto_master"
-          become: true
-          ansible.builtin.lineinfile:
-            path: /private/etc/auto_master
-            regexp: "auto_nfs"
-            line: "/-                      auto_nfs        -nobrowse,nosuid"
-            unsafe_writes: true
+      - name: Add NFS shared drives to macs
+        when: mac_autofs_type == 'nfs'
+        block:
+            - name: Add auto_nfs to "/private/etc/auto_master"
+              become: true
+              ansible.builtin.lineinfile:
+                  path: /private/etc/auto_master
+                  regexp: "auto_nfs"
+                  line: "/-                      auto_nfs        -nobrowse,nosuid"
+                  unsafe_writes: true
 
-        - name: add mounts to /etc/auto_nfs
-          become: true
-          ansible.builtin.lineinfile:
-            create: true
-            path: /private/etc/auto_nfs
-            regexp: "{{ item.src }}"
-            line: "{{ item.local }}   -fstype=nfs,bg,intr,noowners,rw,vers=4   nfs://{{ item.src }}"
-            state: present
-            unsafe_writes: true
-            mode: 0644
-          loop: "{{ mac_nfs_mounts_list if mac_nfs_mounts_list is iterable else [] }}"
-          notify: mac_run_automount
+            - name: Add mounts to /etc/auto_nfs
+              become: true
+              ansible.builtin.lineinfile:
+                  create: true
+                  path: /private/etc/auto_nfs
+                  regexp: "{{ item.src }}"
+                  line: "{{ item.local }}   -fstype=nfs,bg,intr,noowners,rw,vers=4   nfs://{{ item.src }}"
+                  state: present
+                  unsafe_writes: true
+                  mode: 0644
+              loop: "{{ mac_nfs_mounts_list if mac_nfs_mounts_list is iterable else [] }}"
+              notify: mac_run_automount
 
-        - name: remove old mounts from /etc/auto_nfs
-          become: true
-          ansible.builtin.lineinfile:
-            create: true
-            path: /private/etc/auto_nfs
-            regexp: "{{ item.src }}"
-            line: "{{ item.local }}   -fstype=nfs,bg,intr,noowners,rw,vers=4   nfs://{{ item.src }}"
-            state: absent
-            unsafe_writes: true
-            mode: 0644
-          notify: mac_run_automount_unmount
-          loop: "{{ mac_nfs_mounts_remove if mac_nfs_mounts_remove is iterable else [] }}"
+            - name: Remove old mounts from /etc/auto_nfs
+              become: true
+              ansible.builtin.lineinfile:
+                  create: true
+                  path: /private/etc/auto_nfs
+                  regexp: "{{ item.src }}"
+                  line: "{{ item.local }}   -fstype=nfs,bg,intr,noowners,rw,vers=4   nfs://{{ item.src }}"
+                  state: absent
+                  unsafe_writes: true
+                  mode: 0644
+              notify: mac_run_automount_unmount
+              loop: "{{ mac_nfs_mounts_remove if mac_nfs_mounts_remove is iterable else [] }}"
 
-    - name: add AFP shared drives to macs
-      when: mac_autofs_type == 'afp'
-      block:
-        - name: add auto_afp to "/private/etc/auto_master"
-          become: true
-          ansible.builtin.lineinfile:
-            path: /private/etc/auto_master
-            regexp: "auto_afp"
-            line: "/-                      auto_afp        -nobrowse,nosuid"
-            unsafe_writes: true
+      - name: Add AFP shared drives to macs
+        when: mac_autofs_type == 'afp'
+        block:
+            - name: Add auto_afp to "/private/etc/auto_master"
+              become: true
+              ansible.builtin.lineinfile:
+                  path: /private/etc/auto_master
+                  regexp: "auto_afp"
+                  line: "/-                      auto_afp        -nobrowse,nosuid"
+                  unsafe_writes: true
 
-        - name: add mounts to /etc/auto_afp
-          become: true
-          ansible.builtin.lineinfile:
-            create: true
-            path: /private/etc/auto_afp
-            regexp: "{{ item.src }}"
-            line: "{{ item.local }}   -fstype=afp,rw  afp://{{ item.src }}"
-            state: present
-            unsafe_writes: true
-            mode: 0644
-          loop: "{{ mac_afp_or_smb_mounts_list if mac_afp_or_smb_mounts_list is iterable else [] }}"
-          notify: mac_run_automount
+            - name: Add mounts to /etc/auto_afp
+              become: true
+              ansible.builtin.lineinfile:
+                  create: true
+                  path: /private/etc/auto_afp
+                  regexp: "{{ item.src }}"
+                  line: "{{ item.local }}   -fstype=afp,rw  afp://{{ item.src }}"
+                  state: present
+                  unsafe_writes: true
+                  mode: 0644
+              loop: "{{ mac_afp_or_smb_mounts_list if mac_afp_or_smb_mounts_list is iterable else [] }}"
+              notify: mac_run_automount
 
-        - name: remove mounts from /etc/auto_afp
-          become: true
-          ansible.builtin.lineinfile:
-            create: true
-            path: /private/etc/auto_afp
-            regexp: "{{ item.src }}"
-            line: "{{ item.local }}   -fstype=afp,rw  afp://{{ item.src }}"
-            state: present
-            unsafe_writes: true
-            mode: 0644
-          loop: "{{ mac_afp_or_smb_mounts_remove if mac_afp_or_smb_mounts_remove is iterable else [] }}"
-          notify: mac_run_automount_unmount
+            - name: Remove mounts from /etc/auto_afp
+              become: true
+              ansible.builtin.lineinfile:
+                  create: true
+                  path: /private/etc/auto_afp
+                  regexp: "{{ item.src }}"
+                  line: "{{ item.local }}   -fstype=afp,rw  afp://{{ item.src }}"
+                  state: present
+                  unsafe_writes: true
+                  mode: 0644
+              loop: "{{ mac_afp_or_smb_mounts_remove if mac_afp_or_smb_mounts_remove is iterable else [] }}"
+              notify: mac_run_automount_unmount
 
-    - name: add SMB shared drives to macs
-      when: mac_autofs_type == 'smb'
-      block:
-        - name: add auto_smb to "/private/etc/auto_master"
-          become: true
-          ansible.builtin.lineinfile:
-            path: /private/etc/auto_master
-            regexp: "auto_smb"
-            line: "/-                      auto_smb         -noowners,nosuid"
-            unsafe_writes: true
+      - name: Add SMB shared drives to macs
+        when: mac_autofs_type == 'smb'
+        block:
+            - name: Add auto_smb to "/private/etc/auto_master"
+              become: true
+              ansible.builtin.lineinfile:
+                  path: /private/etc/auto_master
+                  regexp: "auto_smb"
+                  line: "/-                      auto_smb         -noowners,nosuid"
+                  unsafe_writes: true
 
-        - name: add mounts to /etc/auto_smb
-          become: true
-          ansible.builtin.lineinfile:
-            create: true
-            path: /private/etc/auto_smb
-            regexp: "{{ item.src }}"
-            line: "{{ item.local }}   -fstype=smbfs,soft,noowners,nosuid,rw  ://{{ smb_username }}:{{ smb_password }}@{{ item.src }}"
-            state: present
-            unsafe_writes: true
-            mode: 0644
-          loop: "{{ mac_afp_or_smb_mounts_list if mac_afp_or_smb_mounts_list is iterable else [] }}"
-          notify: mac_run_automount
+            - name: Add mounts to /etc/auto_smb
+              become: true
+              ansible.builtin.lineinfile:
+                  create: true
+                  path: /private/etc/auto_smb
+                  regexp: "{{ item.src }}"
+                  line: "{{ item.local }}   -fstype=smbfs,soft,noowners,nosuid,rw  ://{{ smb_username }}:{{ smb_password }}@{{ item.src }}"
+                  state: present
+                  unsafe_writes: true
+                  mode: 0644
+              loop: "{{ mac_afp_or_smb_mounts_list if mac_afp_or_smb_mounts_list is iterable else [] }}"
+              notify: mac_run_automount
 
-        - name: remove mounts from /etc/auto_smb
-          become: true
-          ansible.builtin.lineinfile:
-            create: true
-            path: /private/etc/auto_smb
-            regexp: "{{ item.src }}"
-            line: "{{ item.local }}   -fstype=afp,rw  afp://{{ item.src }}"
-            state: present
-            unsafe_writes: true
-            mode: 0644
-          loop: "{{ mac_afp_or_smb_mounts_remove if mac_afp_or_smb_mounts_remove is iterable else [] }}"
-          notify: mac_run_automount_unmount
+            - name: Remove mounts from /etc/auto_smb
+              become: true
+              ansible.builtin.lineinfile:
+                  create: true
+                  path: /private/etc/auto_smb
+                  regexp: "{{ item.src }}"
+                  line: "{{ item.local }}   -fstype=afp,rw  afp://{{ item.src }}"
+                  state: present
+                  unsafe_writes: true
+                  mode: 0644
+              loop: "{{ mac_afp_or_smb_mounts_remove if mac_afp_or_smb_mounts_remove is iterable else [] }}"
+              notify: mac_run_automount_unmount

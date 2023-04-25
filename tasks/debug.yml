@@ -33,5 +33,5 @@
 #   when:
 #     - ansible_facts['system_vendor'] is search("Synology")
 
-- name: "end play"
+- name: "End play"
   ansible.builtin.meta: end_play
