@@ -7,7 +7,7 @@
     version     = "0.2.0"
 
     [tool.poetry.dependencies]
-        ansible      = "^7.2.0"
+        ansible      = "^7.5.0"
         ansible-lint = { version = "^6.12.1", markers = "platform_system != 'Windows'" }
         commitizen   = "^2.40.0"
         poethepoet   = "^0.18.1"
@@ -15,9 +15,16 @@
         python       = "^3.9"
         yamllint     = "^1.29.0"
 
+    [tool.poetry.group.dev.dependencies]
+        black = "^23.3.0"
+        sh    = "^2.0.4"
+
 [build-system]
     build-backend = "poetry.core.masonry.api"
     requires      = ["poetry-core"]
+
+[tool.black]
+    line-length = 100
 
 [tool.commitizen]
     bump_message             = "bump(release): v$current_version → v$new_version"
