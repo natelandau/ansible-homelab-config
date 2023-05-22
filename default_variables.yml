@@ -8,7 +8,7 @@ prometheus_verssion: 2.42.0
 speedtest_cli_version: 1.2.0
 tdarr_installer_version: 2.00.13
 telegraf_version: 1.25.3
-traefik_version: "v2.9.9"
+traefik_version: "v2.10.1"
 
 # ---------------------------------- SERVICE STATIC PORT MAPPINGS
 authelia_port: "9091"

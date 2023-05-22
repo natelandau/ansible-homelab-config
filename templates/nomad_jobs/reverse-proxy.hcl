@@ -221,7 +221,7 @@ job "reverse-proxy" {
 
           resources {
               cpu    = 200 # MHz
-              memory = 110 # MB
+              memory = 1000 # MB
           }
 
       } // task authelia
