@@ -10,6 +10,8 @@ exclude_paths:
     - galaxy-roles/
     - .cz.yaml
     - vault.yml
+    - .venv/
+    - ansible_collections/
 
 skip_list:
     - name[template]
