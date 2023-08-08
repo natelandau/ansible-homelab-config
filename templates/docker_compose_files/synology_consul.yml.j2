@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   consul:
-    image: consul:{{ consul_version }}
+    image: hashicorp/consul:{{ consul_version }}
     hostname: consul
     container_name: consul
     network_mode: "host"
