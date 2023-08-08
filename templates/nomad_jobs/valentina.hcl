@@ -32,13 +32,14 @@ job "valentina" {
     task "valentina" {
 
       env {
-            PGID                    = "${meta.PGID}"
-            PUID                    = "${meta.PUID}"
-            TZ                      = "America/New_York"
-            VALENTINA_DISCORD_TOKEN = "{{ valentina_discord_token }}"
-            VALENTINA_GUILDS        = "{{ valentina_guids }}"
-            VALENTINA_LOG_LEVEL     = "INFO"
-            VALENTINA_OWNER_IDS     = "{{ valentina_owner_ids }}"
+            PGID                     = "${meta.PGID}"
+            PUID                     = "${meta.PUID}"
+            TZ                       = "America/New_York"
+            VALENTINA_DISCORD_TOKEN  = "{{ valentina_discord_token }}"
+            VALENTINA_GUILDS         = "{{ valentina_guids }}"
+            VALENTINA_LOG_LEVEL      = "INFO"
+            VALENTINA_OWNER_IDS      = "{{ valentina_owner_ids }}"
+            VALENTINA_OWNER_CHANNELS = "{{ valentina_owner_channels }}"
       }
 
       driver = "docker"
