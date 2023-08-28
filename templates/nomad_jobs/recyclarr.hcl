@@ -39,7 +39,7 @@ job "recyclarr" {
       // user = "${meta.PUID}:${meta.PGID}"
       driver = "docker"
       config {
-          image    = "ghcr.io/recyclarr/recyclarr:4"
+          image    = "ghcr.io/recyclarr/recyclarr:{{ recyclarr_version }}"
           hostname = "${NOMAD_TASK_NAME}"
           init     = true
       } // docker config
@@ -70,7 +70,7 @@ job "recyclarr" {
 sonarr:
     series:
         base_url: https://sonarr.{{ homelab_domain_name }}/
-        api_key: a6cedb325b5645eeb08acb06a42b7746
+        api_key: {{ sonarr_api_key }}
         delete_old_custom_formats: true
 
         # Quality definitions from the guide to sync to Sonarr. Choices: series, anime
@@ -109,13 +109,20 @@ radarr:
     movies:
         # Set the URL/API Key to your actual instance
         base_url: https://radarr.{{ homelab_domain_name }}/
-        api_key: 53060417cccf4978bf7384c7869616f1
+        api_key: {{ radarr_api_key }}
         delete_old_custom_formats: true
+        replace_existing_custom_formats: true
 
         # Which quality definition in the guide to sync to Radarr. Only choice right now is 'movie'
         quality_definition:
             type: movie
             preferred_ratio: 0.5
+
+        quality_profiles:
+            - name: "720p/1080p"
+              reset_unmatched_scores: true
+            - name: "720p/1080p Remux"
+              reset_unmatched_scores: true
 
         custom_formats:
             # Use `recyclarr list custom-formats radarr` for values you can put here.
@@ -154,9 +161,7 @@ radarr:
                   - af94e0fe497124d1f9ce732069ec8c3b # WEB Tier 03
               quality_profiles:
                   - name: "720p/1080p"
-                    reset_unmatched_scores: true
                   - name: "720p/1080p Remux"
-                    reset_unmatched_scores: true
 
             # HDR FORMATS
             # ########################
