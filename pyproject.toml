@@ -7,8 +7,8 @@
     version     = "0.2.0"
 
     [tool.poetry.dependencies]
-        ansible      = "^8.2.0"
-        ansible-lint = { version = "^6.12.1", markers = "platform_system != 'Windows'" }
+        ansible      = "^8.3.0"
+        ansible-lint = { version = "^6.18.0", markers = "platform_system != 'Windows'" }
         commitizen   = "^2.40.0"
         poethepoet   = "^0.18.1"
         pre-commit   = "^3.3.3"
@@ -17,7 +17,7 @@
 
     [tool.poetry.group.dev.dependencies]
         black = "^23.7.0"
-        sh    = "^2.0.5"
+        sh    = "^2.0.6"
 
 [build-system]
     build-backend = "poetry.core.masonry.api"

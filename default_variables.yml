@@ -1,7 +1,7 @@
 ---
 # ---------------------------------- SOFTWARE VERSIONS
 authelia_version: 4.37.5
-consul_version: 1.16.0
+consul_version: 1.16.1
 influxdb_version: 1.11.1
 nomad_version: 1.6.1
 prometheus_verssion: 2.46.0
