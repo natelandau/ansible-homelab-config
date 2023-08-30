@@ -28,7 +28,7 @@ job "wikijs" {
       }
     }
 
-    task "await_db_filesytem" {
+    task "await_db_filesystem" {
 
       constraint {
         attribute = "${node.unique.name}"
@@ -56,7 +56,7 @@ job "wikijs" {
         }
     } // /task
 
-    task "await_backup_filesytem" {
+    task "await_backup_filesystem" {
 
       constraint {
         attribute = "${node.unique.name}"
@@ -180,7 +180,7 @@ group "wikijs_app_group" {
     }
   } // /task
 
-  task "await_filesytem" {
+  task "await_filesystem" {
       driver = "docker"
 
       config {

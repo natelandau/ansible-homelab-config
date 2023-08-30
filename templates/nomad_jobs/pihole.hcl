@@ -37,7 +37,7 @@ job "pihole" {
       // }
     }
 
-    task "await_filesytem" {
+    task "await_filesystem" {
       driver = "docker"
 
       config {

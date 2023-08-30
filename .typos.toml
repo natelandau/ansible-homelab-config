@@ -1,0 +1,8 @@
+[default]
+    default.locale = "en_us"
+
+    [default.extend-words]
+        Hashi = "Hashi" # Hashicorpt
+
+[files]
+    extend-exclude = ["galaxy-roles/"]

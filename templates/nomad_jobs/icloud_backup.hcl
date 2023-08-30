@@ -71,7 +71,7 @@ job "icloud_backup" {
                   # Drive destination
                   root: "icloud"
                   smtp:
-                    # If you want to recieve email notifications about expired/missing 2FA credentials then uncomment
+                    # If you want to receive email notifications about expired/missing 2FA credentials then uncomment
                     email: "{{ email_smtp_account }}"
                     # optional, to email address. Default is sender email.
                     #to: "receiver@test.com"
@@ -120,7 +120,7 @@ job "icloud_backup" {
                 photos:
                   destination: "photos"
                   remove_obsolete: true
-                  sync_inteval: 172800 # 2 days
+                  sync_interval: 172800 # 2 days
                   filters:
                     albums:
                       # - "album1"

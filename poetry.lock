@@ -17,14 +17,14 @@ ansible-core = ">=2.15.3,<2.16.0"
 
 [[package]]
 name = "ansible-compat"
-version = "4.1.7"
+version = "4.1.8"
 description = "Ansible compatibility goodies"
 category = "main"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "ansible-compat-4.1.7.tar.gz", hash = "sha256:277dd6588c3d2e6c5c793e9d0517afef03da2e67631c6f7f8dde42f2631857da"},
-    {file = "ansible_compat-4.1.7-py3-none-any.whl", hash = "sha256:064406527d79ccc9ba188c1ef5fee938c7d15e7d7b0c73f3f1535810008017b1"},
+    {file = "ansible-compat-4.1.8.tar.gz", hash = "sha256:f58135f5d123e08fdb7e11849b82945e1900f8c899ba0859d4b41b25c76ca955"},
+    {file = "ansible_compat-4.1.8-py3-none-any.whl", hash = "sha256:7560e511a660e286c4e8777d82e25990526e45601c37b872c1b64a62126239a5"},
 ]
 
 [package.dependencies]
@@ -426,19 +426,22 @@ files = [
 
 [[package]]
 name = "filelock"
-version = "3.12.2"
+version = "3.12.3"
 description = "A platform independent file lock."
 category = "main"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "filelock-3.12.2-py3-none-any.whl", hash = "sha256:cbb791cdea2a72f23da6ac5b5269ab0a0d161e9ef0100e653b69049a7706d1ec"},
-    {file = "filelock-3.12.2.tar.gz", hash = "sha256:002740518d8aa59a26b0c76e10fb8c6e15eae825d34b6fdf670333fd7b938d81"},
+    {file = "filelock-3.12.3-py3-none-any.whl", hash = "sha256:f067e40ccc40f2b48395a80fcbd4728262fab54e232e090a4063ab804179efeb"},
+    {file = "filelock-3.12.3.tar.gz", hash = "sha256:0ecc1dd2ec4672a10c8550a8182f1bd0c0a5088470ecd5a125e45f49472fac3d"},
 ]
 
+[package.dependencies]
+typing-extensions = {version = ">=4.7.1", markers = "python_version < \"3.11\""}
+
 [package.extras]
-docs = ["furo (>=2023.5.20)", "sphinx (>=7.0.1)", "sphinx-autodoc-typehints (>=1.23,!=1.23.4)"]
-testing = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "diff-cover (>=7.5)", "pytest (>=7.3.1)", "pytest-cov (>=4.1)", "pytest-mock (>=3.10)", "pytest-timeout (>=2.1)"]
+docs = ["furo (>=2023.7.26)", "sphinx (>=7.1.2)", "sphinx-autodoc-typehints (>=1.24)"]
+testing = ["covdefaults (>=2.3)", "coverage (>=7.3)", "diff-cover (>=7.7)", "pytest (>=7.4)", "pytest-cov (>=4.1)", "pytest-mock (>=3.11.1)", "pytest-timeout (>=2.1)"]
 
 [[package]]
 name = "identify"
@@ -1205,6 +1208,26 @@ files = [
 ]
 
 [[package]]
+name = "typos"
+version = "1.16.8"
+description = "Source Code Spelling Correction"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "typos-1.16.8-py3-none-macosx_10_7_x86_64.whl", hash = "sha256:b4d0bf1728ff35849690c956b0c8f01f6cf00a86d4d76a2fcecda808345417bf"},
+    {file = "typos-1.16.8-py3-none-macosx_11_0_arm64.whl", hash = "sha256:0155e64c26074aec76dabd5e716334aae6cef16371e6457536a7b27be638200e"},
+    {file = "typos-1.16.8-py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:cc2b8831dfae748a831962036aa325d3a6cf339dbf397969779d31381b33081f"},
+    {file = "typos-1.16.8-py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:902c501e9527ceffd43f3f78356ae0c8e0f4e013981438cce91c56fe55fc4b7f"},
+    {file = "typos-1.16.8-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f4ac08d8de1a1657bbe8467afa41776bd7d5991112543cd9337d120185f8b945"},
+    {file = "typos-1.16.8-py3-none-musllinux_1_2_aarch64.whl", hash = "sha256:b3f3f714b03bad7d48b416b218be13395a5980ca1dd71f3e45f22ca0f7b2d44e"},
+    {file = "typos-1.16.8-py3-none-musllinux_1_2_x86_64.whl", hash = "sha256:1e31ea1b36e3860a16e399dacc2584a08fa4114a8f8d1520d7740ddbe1fad28a"},
+    {file = "typos-1.16.8-py3-none-win32.whl", hash = "sha256:3df2e208e0a6385c9f1c990c7222ec2067e499162a7a6c615c0e730deadef4c8"},
+    {file = "typos-1.16.8-py3-none-win_amd64.whl", hash = "sha256:a9a1ed3107c05f34045f2e697c6cdb339a15411ccfc4dd1358cf18d6c684d4a7"},
+    {file = "typos-1.16.8.tar.gz", hash = "sha256:362b1238729eb8644cf9ece59886a40e7ef01eaaf4ff4910e511cb9cf97d5f21"},
+]
+
+[[package]]
 name = "urllib3"
 version = "2.0.4"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
@@ -1292,4 +1315,4 @@ dev = ["doc8", "flake8", "flake8-import-order", "rstcheck[sphinx]", "sphinx"]
 [metadata]
 lock-version = "2.0"
         python-versions = "^3.9"
-content-hash = "725b243d4d377eeae228d6b5b1246aed4a6d893411fc58cce4285dd44e4e5c51"
+content-hash = "6accbfec17ab3bcf1b10eb935e16c19746497d311f074ab9c5931e1f38656f64"

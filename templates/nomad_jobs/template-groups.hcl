@@ -108,7 +108,7 @@ job "TEMPLATE" {
             }
         }
 
-        task "await-TEMPLATEdb" {
+        task "await-TEMPLATEEdb" {
             driver = "docker"
 
             config {
