@@ -32,14 +32,18 @@ job "valentina" {
     task "valentina" {
 
       env {
-            PGID                     = "${meta.PGID}"
-            PUID                     = "${meta.PUID}"
-            TZ                       = "America/New_York"
-            VALENTINA_DISCORD_TOKEN  = "{{ valentina_discord_token }}"
-            VALENTINA_GUILDS         = "{{ valentina_guids }}"
-            VALENTINA_LOG_LEVEL      = "INFO"
-            VALENTINA_OWNER_IDS      = "{{ valentina_owner_ids }}"
-            VALENTINA_OWNER_CHANNELS = "{{ valentina_owner_channels }}"
+            PGID                            = "${meta.PGID}"
+            PUID                            = "${meta.PUID}"
+            TZ                              = "America/New_York"
+            VALENTINA_AWS_ACCESS_KEY_ID     = "{{ valentina_aws_access_key_id }}"
+            VALENTINA_AWS_SECRET_ACCESS_KEY = "{{ valentina_aws_secret_access_key }}"
+            VALENTINA_DISCORD_TOKEN         = "{{ valentina_discord_token }}"
+            VALENTINA_GUILDS                = "{{ valentina_guids }}"
+            VALENTINA_LOG_LEVEL             = "INFO"
+            VALENTINA_LOG_LEVEL_AWS         = "INFO"
+            VALENTINA_OWNER_CHANNELS        = "{{ valentina_owner_channels }}"
+            VALENTINA_OWNER_IDS             = "{{ valentina_owner_ids }}"
+            VALENTINA_S3_BUCKET_NAME        = "{{ valentina_s3_bucket_name}}"
       }
 
       driver = "docker"
