@@ -39,7 +39,7 @@ job "valentina" {
             VALENTINA_AWS_SECRET_ACCESS_KEY = "{{ valentina_aws_secret_access_key }}"
             VALENTINA_DISCORD_TOKEN         = "{{ valentina_discord_token }}"
             VALENTINA_GUILDS                = "{{ valentina_guids }}"
-            VALENTINA_LOG_LEVEL             = "INFO"
+            VALENTINA_LOG_LEVEL             = "DEBUG"
             VALENTINA_LOG_LEVEL_AWS         = "INFO"
             VALENTINA_OWNER_CHANNELS        = "{{ valentina_owner_channels }}"
             VALENTINA_OWNER_IDS             = "{{ valentina_owner_ids }}"

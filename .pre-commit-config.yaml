@@ -1,7 +1,7 @@
 ---
 repos:
     - repo: "https://github.com/commitizen-tools/commitizen"
-      rev: 3.7.0
+      rev: 3.9.0
       hooks:
           - id: "commitizen"
 
@@ -44,7 +44,7 @@ repos:
             entry: yamllint --strict --config-file .yamllint.yml
 
     - repo: "https://github.com/crate-ci/typos"
-      rev: v1.16.8
+      rev: v1.16.11
       hooks:
           - id: typos
 
@@ -58,9 +58,11 @@ repos:
             # This calls a custom script. Remove if you don't need it.
           - id: stopwords
             name: stopwords
-            entry: bash -c '~/bin/git-stopwords ${PWD}/"$@"'
+            entry: git-stopwords
+            # args: ["-v"]
             language: system
             pass_filenames: true
+            types: [text]
 
           - id: ansible-lint
             name: running ansible-lint
