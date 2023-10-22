@@ -1,6 +1,6 @@
 ---
-- hosts: all
-  name: "Running playbook"
+- name: "Running playbook"
+  hosts: all
   serial: 1
 
   vars_files:
