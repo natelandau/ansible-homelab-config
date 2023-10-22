@@ -40,10 +40,10 @@ job "sabnzbd" {
     task "sabnzbd" {
 
       env {
-          PUID = "${meta.PUID}"
-          PGID = "${meta.PGID}"
-          TZ   = "America/New_York"
-
+          PUID        = "${meta.PUID}"
+          PGID        = "${meta.PGID}"
+          TZ          = "America/New_York"
+          DOCKER_MODS = "linuxserver/mods:universal-cron"
       }
 
       driver = "docker"
@@ -55,7 +55,8 @@ job "sabnzbd" {
             "${meta.nfsStorageRoot}/media/downloads/nzb:/nzbd",
             "${meta.nfsStorageRoot}/media/downloads/temp:/incomplete-downloads",
             "${meta.nfsStorageRoot}/media/downloads/complete:/downloads",
-            "${meta.nfsStorageRoot}/nate:/nate"
+            "${meta.nfsStorageRoot}/nate:/nate",
+            "${meta.nfsStorageRoot}/pi-cluster/${NOMAD_TASK_NAME}/startup-scripts:/custom-cont-init.d"
           ]
           ports = ["http"]
       } // docker config
@@ -86,10 +87,10 @@ job "sabnzbd" {
           }
       } // service
 
-      // resources {
-      //     cpu    = 100 # MHz
-      //     memory = 300 # MB
-      // } // resources
+      resources {
+          cpu    = 5000 # MHz
+          memory = 1000 # MB
+      } // resources
 
     } // task
 
