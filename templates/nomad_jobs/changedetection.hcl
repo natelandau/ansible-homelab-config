@@ -57,6 +57,7 @@ job "changedetection" {
       service  {
           port = "webUI"
           name = "${NOMAD_JOB_NAME}"
+          provider = "nomad"
           tags = [
               "traefik.enable=true",
               "traefik.http.routers.${NOMAD_JOB_NAME}.rule=Host(`changes.{{ homelab_domain_name }}`)",
@@ -75,7 +76,6 @@ job "changedetection" {
           check_restart {
               limit           = 0
               grace           = "1m"
-              ignore_warnings = true
           }
       } // service
 

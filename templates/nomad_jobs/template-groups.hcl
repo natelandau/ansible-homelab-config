@@ -158,6 +158,7 @@ job "TEMPLATE" {
             service {
                 name = "${NOMAD_TASK_NAME}"
                 port = "port2"
+                provider = "nomad"
                 tags = [
                   "traefik.enable=true",
                     "traefik.http.routers.${NOMAD_TASK_NAME}.rule=Host(`${NOMAD_TASK_NAME}.{{ homelab_domain_name }}`)",
@@ -178,7 +179,6 @@ job "TEMPLATE" {
                 check_restart {
                     limit           = 3
                     grace           = "1m"
-                    ignore_warnings = true
                 }
             } // service
 

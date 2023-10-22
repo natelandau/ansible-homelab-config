@@ -193,6 +193,7 @@ job "reverse-proxy" {
           service  {
               port = "authelia-port"
               name = "${NOMAD_TASK_NAME}"
+              provider = "nomad"
               tags = [
                   "traefik.enable=true",
                   "traefik.http.routers.${NOMAD_TASK_NAME}.rule=Host(`authelia.{{ homelab_domain_name }}`)",
@@ -215,7 +216,6 @@ job "reverse-proxy" {
               check_restart {
                   limit           = 0
                   grace           = "1m"
-                  ignore_warnings = true
               }
           } // service
 
@@ -238,6 +238,7 @@ job "reverse-proxy" {
           service {
             port = "whoami"
             name = "${NOMAD_TASK_NAME}"
+            provider = "nomad"
             tags = [
               "traefik.enable=true",
               "traefik.http.routers.${NOMAD_TASK_NAME}.rule=Host(`${NOMAD_TASK_NAME}.{{ homelab_domain_name }}`)",
@@ -245,7 +246,7 @@ job "reverse-proxy" {
               "traefik.http.routers.${NOMAD_TASK_NAME}.service=${NOMAD_TASK_NAME}",
               "traefik.http.routers.${NOMAD_TASK_NAME}.tls=true",
               "traefik.http.routers.${NOMAD_TASK_NAME}.tls.certresolver=cloudflare",
-              "traefik.http.routers.${NOMAD_TASK_NAME}.middlewares=authelia@file"
+            //   "traefik.http.routers.${NOMAD_TASK_NAME}.middlewares=authelia@file"
               ]
             check {
               type     = "http"
@@ -256,7 +257,6 @@ job "reverse-proxy" {
             check_restart {
               limit           = 2
               grace           = "1m"
-              ignore_warnings = true
             }
           }
           resources {
@@ -294,18 +294,20 @@ job "reverse-proxy" {
                 "--providers.file.filename=/local/traefik/siteconfigs.toml",
                 "--providers.file.watch=true",
                 "--providers.consulcatalog=true",
-                "--providers.consulcatalog.endpoint.address=http://consul.service.consul:8500",
+                "--providers.consulcatalog.endpoint.address=http://${NOMAD_IP_web}:8500",
                 "--providers.consulcatalog.prefix=traefik",
                 "--providers.consulcatalog.exposedbydefault=false",
-                "--metrics=true",
-                "--metrics.influxdb=true",
-                "--metrics.influxdb.address=influxdb.service.consul:{{ influxdb_port }}",
-                "--metrics.influxdb.protocol=http",
-                "--metrics.influxdb.pushinterval=10s",
-                "--metrics.influxdb.database=homelab",
-                "--metrics.influxdb.retentionpolicy=2day",
-                "--metrics.influxdb.addentrypointslabels=true",
-                "--metrics.influxdb.addserviceslabels=true",
+                "--providers.nomad=true",
+                "--providers.nomad.endpoint.address=http://${NOMAD_IP_web}:4646",
+                // "--metrics=true",
+                // "--metrics.influxdb=true",
+                // "--metrics.influxdb.address=influxdb.service.consul:{{ influxdb_port }}",
+                // "--metrics.influxdb.protocol=http",
+                // "--metrics.influxdb.pushinterval=10s",
+                // "--metrics.influxdb.database=homelab",
+                // "--metrics.influxdb.retentionpolicy=2day",
+                // "--metrics.influxdb.addentrypointslabels=true",
+                // "--metrics.influxdb.addserviceslabels=true",
                 "--accesslog=true",
                 "--log=true",
                 "--log.level=ERROR",
@@ -357,10 +359,12 @@ job "reverse-proxy" {
                   scheme = "https"
                   permanent = true
 
+
                 [http.middlewares.authelia.forwardAuth]
-                  address = "http://authelia.service.consul:{{ authelia_port }}/api/verify?rd=https://authelia.{{ homelab_domain_name }}"
+                  address = {% raw %}"http://{{ env "NOMAD_IP_authelia_port" }}:{{ env "NOMAD_PORT_authelia_port" }}{% endraw %}/api/verify?rd=https://authelia.{{ homelab_domain_name }}"
                   trustForwardHeader = true
                   authResponseHeaders = ["Remote-User", "Remote-Groups", "Remote-Name", "Remote-Email"]
+
 
                 [http.middlewares.basicauth.basicauth]
                   usersfile = "/local/traefik/httpasswd"
@@ -396,6 +400,7 @@ job "reverse-proxy" {
         service  {
             port = "dashboard"
             name = "${NOMAD_TASK_NAME}"
+            provider = "nomad"
             tags = [
               "traefik.enable=true",
               "traefik.http.routers.${NOMAD_TASK_NAME}.rule=Host(`${NOMAD_TASK_NAME}.{{ homelab_domain_name }}`)",
@@ -416,7 +421,6 @@ job "reverse-proxy" {
             check_restart {
                 limit           = 0
                 grace           = "1m"
-                ignore_warnings = true
             }
         } // service
 

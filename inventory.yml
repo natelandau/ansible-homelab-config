@@ -42,7 +42,7 @@ all:
                 pis:
                     hosts:
                         rpi1:
-                            ansible_host: 10.0.30.91
+                            ansible_host: "{{ rpi1_ip_address }}"
                             ansible_user: "{{ pi_username }}"
                             ansible_become_pass: "{{ pi_become_pass }}"
                             ansible_ssh_private_key_file: "{{ ssh_key_location }}/rpi1"
@@ -58,7 +58,7 @@ all:
                             manage_apt_packages_list: true
                             ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
                         rpi2:
-                            ansible_host: 10.0.30.92
+                            ansible_host: "{{ rpi2_ip_address }}"
                             ansible_user: "{{ pi_username }}"
                             ansible_become_pass: "{{ pi_become_pass }}"
                             ansible_ssh_private_key_file: "{{ ssh_key_location }}/rpi2"
@@ -72,7 +72,7 @@ all:
                             manage_apt_packages_list: true
                             ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
                         rpi3:
-                            ansible_host: 10.0.30.93
+                            ansible_host: "{{ rpi3_ip_address }}"
                             ansible_user: "{{ pi_username }}"
                             ansible_become_pass: "{{ pi_become_pass }}"
                             ansible_ssh_private_key_file: "{{ ssh_key_location }}/rpi3"
@@ -86,7 +86,7 @@ all:
                             manage_apt_packages_list: true
                             ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
                         rpi4:
-                            ansible_host: 10.0.30.94
+                            ansible_host: "{{ rpi4_ip_address }}"
                             ansible_user: "{{ pi_username }}"
                             ansible_become_pass: "{{ pi_become_pass }}"
                             ansible_ssh_private_key_file: "{{ ssh_key_location }}/rpi4"
@@ -102,7 +102,7 @@ all:
                 macs:
                     hosts:
                         macmini:
-                            ansible_host: 10.0.0.4
+                            ansible_host: "{{ macmini_ip_address }}"
                             ansible_user: "{{ my_username }}"
                             ansible_become_pass: "{{ mac_become_pass }}"
                             ansible_ssh_private_key_file: "{{ ssh_key_location }}/macMini"
@@ -117,7 +117,7 @@ all:
                             manage_homebrew_package_list: true
                             ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
                         imac:
-                            ansible_host: 10.0.0.25
+                            ansible_host: "{{ imac_ip_address }}"
                             ansible_user: "{{ my_username }}"
                             ansible_become_pass: "{{ mac_become_pass }}"
                             ansible_ssh_private_key_file: "{{ ssh_key_location }}/imac"
@@ -129,7 +129,7 @@ all:
                             is_shared_storage_client: true
                             ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
                         skimmbook:
-                            ansible_host: 10.0.0.21
+                            ansible_host: "{{ skimmbook_ip_address }}"
                             ansible_user: "{{ my_username }}"
                             ansible_become_pass: "{{ mac_become_pass }}"
                             ansible_ssh_private_key_file: "{{ ssh_key_location }}/skimmbook"
@@ -140,22 +140,11 @@ all:
                             is_tdarr_node: true
                             is_shared_storage_client: true
                             ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
-                        vpnmac:
-                            ansible_host: 10.0.90.2
-                            ansible_user: "{{ my_username }}"
-                            ansible_become_pass: "{{ mac_become_pass }}"
-                            ansible_ssh_private_key_file: "{{ ssh_key_location }}/skimmbook"
-                            ansible_python_interpreter: "/Users/natelandau/.pyenv/shims/python"
-                            ansible_port: 22
-                            mac_arm: true
-                            manage_homebrew_package_list: true
-                            is_tdarr_node: true
-                            ansible_ssh_extra_args: "-o IdentitiesOnly=yes"
                 nas:
                     hosts:
                         synology:
-                            ansible_host: 10.0.0.6
-                            synology_second_ip: 10.0.30.6
+                            ansible_host: "{{ synology_ip_address_1 }}"
+                            synology_second_ip: "{{ synology_ip_address_2 }}"
                             ansible_user: "{{ my_username }}"
                             ansible_become_pass: "{{ synology_become_pass }}"
                             ansible_ssh_private_key_file: "{{ ssh_key_location }}/synology"

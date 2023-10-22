@@ -122,6 +122,7 @@ job "wikijs" {
       service {
         port = "db"
         name = "wikijsdb"
+        provider = "nomad"
         check {
           type     = "tcp"
           port     = "db"
@@ -131,7 +132,6 @@ job "wikijs" {
         check_restart {
           limit = 2
           grace = "1m"
-          ignore_warnings = true
         }
       }
 
@@ -225,6 +225,7 @@ group "wikijs_app_group" {
     service {
       port = "http"
       name = "wikijs"
+      provider = "nomad"
       tags = [
         "traefik.enable=true",
         "traefik.http.routers.wikijs.rule=Host(`wiki.{{ homelab_domain_name }}`)",
@@ -241,7 +242,6 @@ group "wikijs_app_group" {
       check_restart {
         limit = 3
         grace = "30s"
-        ignore_warnings = true
       }
     } // /service
 

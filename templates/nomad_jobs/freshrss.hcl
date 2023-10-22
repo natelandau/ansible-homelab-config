@@ -54,6 +54,7 @@ job "freshrss" {
       service  {
           port = "port1"
           name = "${NOMAD_TASK_NAME}"
+          provider = "nomad"
           tags = [
               "traefik.enable=true",
               "traefik.http.routers.${NOMAD_TASK_NAME}.rule=Host(`rss.{{ homelab_domain_name }}`)",
@@ -73,7 +74,6 @@ job "freshrss" {
           check_restart {
               limit           = 0
               grace           = "1m"
-              ignore_warnings = true
           }
       } // service
 

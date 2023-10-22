@@ -78,6 +78,7 @@ job "influxdb" {
       service  {
         port = "httpAPI"
         name = "${NOMAD_JOB_NAME}"
+        provider = "nomad"
 
         check {
           type     = "tcp"
@@ -89,7 +90,6 @@ job "influxdb" {
         check_restart {
           limit           = 0
           grace           = "1m"
-          ignore_warnings = true
         }
 
 

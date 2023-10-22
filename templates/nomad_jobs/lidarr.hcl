@@ -82,6 +82,7 @@ job "lidarr" {
       service  {
         port = "lidarr"
         name = "${NOMAD_JOB_NAME}"
+        provider = "nomad"
         tags = [
           "traefik.enable=true",
           "traefik.http.routers.${NOMAD_JOB_NAME}.rule=Host(`${NOMAD_JOB_NAME}.{{ homelab_domain_name }}`)",
@@ -100,7 +101,6 @@ job "lidarr" {
         check_restart {
           limit           = 0
           grace           = "10m"
-          ignore_warnings = true
         }
       } // service
 
