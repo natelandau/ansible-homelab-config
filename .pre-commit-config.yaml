@@ -44,7 +44,7 @@ repos:
             entry: yamllint --strict --config-file .yamllint.yml
 
     - repo: "https://github.com/crate-ci/typos"
-      rev: typos-dict-v0.11.2
+      rev: v1.16.23
       hooks:
           - id: typos
 

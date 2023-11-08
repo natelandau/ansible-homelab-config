@@ -1,4 +1,4 @@
-job "TEMPLATE" {
+job "ladder" {
     region      = "global"
     datacenters = ["{{ datacenter_name }}"]
     type        = "service"
@@ -20,7 +20,7 @@ job "TEMPLATE" {
       stagger           = "30s"
   }
 
-  group "TEMPLATE" {
+  group "ladder" {
 
     count = 1
 
@@ -31,29 +31,28 @@ job "TEMPLATE" {
 
     network {
         port "port1" {
-            static = "80"
-            to     = "80"
+            to     = "8080"
         }
     }
 
-    task "TEMPLATE" {
+    task "ladder" {
 
-      // env {
-          // PUID        = "${meta.PUID}"
-          // PGID        = "${meta.PGID}"
-      // }
+      env {
+          PUID        = "${meta.PUID}"
+          PGID        = "${meta.PGID}"
+          TZ          = "America/New_York"
+          PORT        = "8080"
+      }
 
       driver = "docker"
       config {
-          image              = ""
-          image_pull_timeout = "10m"
+          image              = "ghcr.io/kubero-dev/ladder:latest"
           hostname           = "${NOMAD_TASK_NAME}"
-          volumes            = [
-            "${meta.nfsStorageRoot}/pi-cluster/${NOMAD_TASK_NAME}:/etc/TEMPLATE/",
-            "/etc/timezone:/etc/timezone:ro",
-            "/etc/localtime:/etc/localtime:ro"
-          ]
-          ports = ["port1"]
+          ports              = ["port1"]
+          image_pull_timeout = "10m"
+        //   volumes  = [
+        //     "${meta.nfsStorageRoot}/pi-cluster/${NOMAD_TASK_NAME}:/etc/TEMPLATE/"
+        //   ]
       } // docker config
 
       service {
@@ -67,7 +66,6 @@ job "TEMPLATE" {
               "traefik.http.routers.${NOMAD_TASK_NAME}.service=${NOMAD_TASK_NAME}",
               "traefik.http.routers.${NOMAD_TASK_NAME}.tls=true",
               "traefik.http.routers.${NOMAD_TASK_NAME}.tls.certresolver=cloudflare",
-              "traefik.http.routers.${NOMAD_TASK_NAME}.middlewares=authelia@file"
             ]
 
           check {

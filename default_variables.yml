@@ -10,7 +10,8 @@ speedtest_cli_version: 1.2.0
 tdarr_installer_version: 2.00.13
 telegraf_version: 1.27.2
 traefik_version: "v2.10.4"
-valentina_version: 1.9.3
+valentina_version: 2.0.0
+backup_mongodb_version: "v1.0.0"
 
 # ---------------------------------- SERVICE STATIC PORT MAPPINGS
 authelia_port: "9091"
@@ -101,6 +102,7 @@ apt_packages_list:
     - logrotate
     - lsof
     - nano
+    - netcat
     - net-tools
     - nmap
     - openssh-server
