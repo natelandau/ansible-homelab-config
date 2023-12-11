@@ -23,7 +23,6 @@ job "valentina" {
     group "valentina" {
 
         count = 1
-
         restart {
             attempts = 0
             delay    = "30s"
@@ -148,11 +147,6 @@ job "valentina" {
                 }
             } // service
 
-
         } // task
-
-
     } // group
-
-
 } // job

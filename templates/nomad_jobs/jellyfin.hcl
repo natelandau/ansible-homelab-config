@@ -1,13 +1,13 @@
-job "TEMPLATE" {
+job "jellyfin" {
     region      = "global"
     datacenters = ["{{ datacenter_name }}"]
     type        = "service"
 
-    // constraint {
-    //     attribute = "${node.unique.name}"
-    //     operator  = "regexp"
-    //     value     = "rpi(1|2|3)"
-    // }
+    constraint {
+        attribute = "${node.unique.name}"
+        operator  = "regexp"
+        value     = "macmini"
+    }
 
     update {
         max_parallel      = 1
@@ -20,7 +20,7 @@ job "TEMPLATE" {
         stagger           = "30s"
     }
 
-    group "TEMPLATE" {
+    group "jellyfin" {
 
         count = 1
 
@@ -30,13 +30,17 @@ job "TEMPLATE" {
         }
 
         network {
-            port "port1" {
-                static = "80"
-                to     = "80"
+            port "webui" {
+                static = "8096"
+                to     = "8096"
+            }
+            port "udp1" {
+                static = "7359"
+                to     = "7359"
             }
         }
 
-        task "TEMPLATE" {
+        task "jellyfin" {
 
             env {
                 PUID = "${meta.PUID}"
@@ -46,17 +50,19 @@ job "TEMPLATE" {
 
             driver = "docker"
             config {
-                image              = ""
+                image              = "lscr.io/linuxserver/jellyfin:latest"
                 image_pull_timeout = "10m"
                 hostname           = "${NOMAD_TASK_NAME}"
                 volumes            = [
-                    "${meta.nfsStorageRoot}/pi-cluster/${NOMAD_TASK_NAME}:/etc/TEMPLATE/"
+                    "${meta.nfsStorageRoot}/pi-cluster/${NOMAD_TASK_NAME}:/config",
+                    "${meta.nfsStorageRoot}/media/media/movies:/data/movies",
+                    "${meta.nfsStorageRoot}/media/media/tv:/data/tv"
                 ]
-                ports = ["port1"]
+                ports = ["webui", "udp1"]
             } // docker config
 
             service {
-                port = "port1"
+                port = "webui"
                 name = "${NOMAD_TASK_NAME}"
                 provider = "nomad"
                 tags = [
@@ -66,12 +72,11 @@ job "TEMPLATE" {
                     "traefik.http.routers.${NOMAD_TASK_NAME}.service=${NOMAD_TASK_NAME}",
                     "traefik.http.routers.${NOMAD_TASK_NAME}.tls=true",
                     "traefik.http.routers.${NOMAD_TASK_NAME}.tls.certresolver=cloudflare",
-                    "traefik.http.routers.${NOMAD_TASK_NAME}.middlewares=authelia@file"
-                    ]
+                ]
 
                 check {
                     type     = "tcp"
-                    port     = "port1"
+                    port     = "webui"
                     interval = "30s"
                     timeout  = "4s"
                 }
@@ -83,15 +88,11 @@ job "TEMPLATE" {
 
             } // service
 
-            // resources {
-            //     cpu    = 100 # MHz
-            //     memory = 300 # MB
-            // } // resources
+            resources {
+                cpu    = 5000 # MHz
+                memory = 1000 # MB
+            } // resources
 
         } // task
-
-
     } // group
-
-
 } // job
