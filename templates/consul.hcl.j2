@@ -5,11 +5,11 @@
 {% if is_consul_server %}
 "server"    = true
 "ui_config" = {
-  "enabled" = true
+    "enabled" = true
 }
 {% else %}
 "ui_config" = {
-  "enabled" = false
+    "enabled" = false
 }
 {% endif %}
 
@@ -28,15 +28,15 @@
 
 # ----------------------------------------- Networking
 "addresses" = {
-  "dns"   = "0.0.0.0"
-  "grpc"  = "0.0.0.0"
-  "http"  = "0.0.0.0"
-  "https" = "0.0.0.0"
+    "dns"   = "0.0.0.0"
+    "grpc"  = "0.0.0.0"
+    "http"  = "0.0.0.0"
+    "https" = "0.0.0.0"
 }
 "ports" = {
-  "dns"     = 8600
-  "http"    = 8500
-  "server"  = 8300
+    "dns"     = 8600
+    "http"    = 8500
+    "server"  = 8300
 }
 
 {% if 'linode' in group_names %}
@@ -57,7 +57,7 @@
 {% if 'linode' in group_names %}
 "retry_join"          = [{% for h in groups['linode-cluster'] if hostvars[h].is_consul_server == true %}"{{ hostvars[h].linode_private_ip }}"{% if not loop.last %}, {% endif %}{% endfor %}]
 {% else %}
-"retry_join"          = [{% for h in groups['lan'] if hostvars[h].is_consul_server == true %}"{{ hostvars[h].ansible_host }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+"retry_join"          = ["{{ rpi1_ip_address }}", "{{ rpi2_ip_address }}", "{{ rpi3_ip_address }}"]
   {% if is_consul_server %}
     {% if 'linode' in group_names %}
 "join_wan"            = [{% for h in groups['linode-cluster'] if hostvars[h].is_consul_server == true %}"{{ hostvars[h].ansible_host }}"{% if not loop.last %}, {% endif %}{% endfor %}]
@@ -81,7 +81,7 @@
 "key_file"                  = "{{ consul_opt_dir }}/certs/{{ datacenter_name }}-server-consul-0-key.pem"
 {% endif %}
 "auto_encrypt" = {
-  "allow_tls" = true
+    "allow_tls" = true
 }
 {% else %} {# Consul Clients #}
 "verify_incoming"           = false
@@ -93,14 +93,14 @@
 "ca_file"                   = "{{ consul_opt_dir }}/certs/consul-agent-ca.pem"
 {% endif %}
 "auto_encrypt" = {
-  "tls" = true
+    "tls" = true
 }
 {% endif %}
 
 "acl" = {
-  enabled                   = false
-  default_policy            = "allow"
-  enable_token_persistence  = true
+    default_policy            = "allow"
+    enable_token_persistence  = true
+    enabled                   = false
 }
 
 # ----------------------------------------- Cluster Operations

@@ -5,28 +5,28 @@ datacenter = "{{ datacenter_name }}"
 
 # ----------------------------------------- Files and Logs
 data_dir              = "{{ nomad_opt_dir_location }}"
-plugin_dir            = "{{ nomad_opt_dir_location }}/plugins"
-log_level             = "warn"
-log_file              = "{{ nomad_opt_dir_location }}/logs/nomad.log"
-log_rotate_max_files  = 5
 enable_syslog         = false
+log_file              = "{{ nomad_opt_dir_location }}/logs/nomad.log"
+log_level             = "warn"
+log_rotate_max_files  = 5
+plugin_dir            = "{{ nomad_opt_dir_location }}/plugins"
 
 # ----------------------------------------- Networking
 bind_addr   = "0.0.0.0" # the default
 
 advertise {
 {% if 'linode' in group_names %}
-  http    = "{{ linode_private_ip }}:4646"
-  rpc     = "{{ linode_private_ip }}:4647"
-  serf    = "{{ linode_private_ip }}:4648" # non-default ports may be specified
+    http    = "{{ linode_private_ip }}:4646"
+    rpc     = "{{ linode_private_ip }}:4647"
+    serf    = "{{ linode_private_ip }}:4648" # non-default ports may be specified
 {% elif 'synology' in group_names %}
-  http    = "{{ synology_second_ip }}:4646"
-  rpc     = "{{ synology_second_ip }}:4647"
-  serf    = "{{ synology_second_ip }}:4648" # non-default ports may be specified
+    http    = "{{ synology_second_ip }}:4646"
+    rpc     = "{{ synology_second_ip }}:4647"
+    serf    = "{{ synology_second_ip }}:4648" # non-default ports may be specified
 {% else %}
-  http    = "{{ ansible_host }}:4646"
-  rpc     = "{{ ansible_host }}:4647"
-  serf    = "{{ ansible_host }}:4648" # non-default ports may be specified
+    http    = "{{ ansible_host }}:4646"
+    rpc     = "{{ ansible_host }}:4647"
+    serf    = "{{ ansible_host }}:4648" # non-default ports may be specified
 {% endif %}
 }
 
@@ -48,170 +48,171 @@ consul {
 
 {% if is_nomad_server %}
     tags  = [
-      "traefik.enable=true",
-      "traefik.http.routers.nomad-server.entryPoints=web,websecure",
-      "traefik.http.routers.nomad-server.service=nomad-server",
-      "traefik.http.routers.nomad-server.rule=Host(`nomad.{{ homelab_domain_name }}`)",
-      "traefik.http.routers.nomad-server.tls=true",
-      "traefik.http.routers.nomad-server.middlewares=authelia@file,redirectScheme@file",
-      "traefik.http.services.nomad-server.loadbalancer.server.port=4646"
+        "traefik.enable=true",
+        "traefik.http.routers.nomad-server.entryPoints=web,websecure",
+        "traefik.http.routers.nomad-server.service=nomad-server",
+        "traefik.http.routers.nomad-server.rule=Host(`nomad.{{ homelab_domain_name }}`)",
+        "traefik.http.routers.nomad-server.tls=true",
+        "traefik.http.routers.nomad-server.middlewares=redirectScheme@file",
+        "traefik.http.services.nomad-server.loadbalancer.server.port=4646"
     ]
 {% endif %}
 }
 
 # ----------------------------------------- Client Config
 client {
-  enabled         = true
+    enabled         = true
 {% if 'pis' in group_names %}
-  node_class      = "rpi"
+    node_class      = "rpi"
 {% elif 'macs' in group_names %}
-  node_class      = "mac"
+    node_class      = "mac"
 {% elif 'synology' in group_names %}
-  node_class      = "synology"
+    node_class      = "synology"
 {% endif %}
-  reserved {
-    cpu            = 250
-    memory         = 100
-    reserved_ports = "22"
-  }
+    reserved {
+        cpu            = 250
+        memory         = 100
+        reserved_ports = "22"
+    }
 {% if not is_nomad_server %}
 {% if 'linode' in group_names %}
-  server_join {
-    retry_join     = [{% for h in groups['linode'] if hostvars[h].is_nomad_server == true %}"{{ hostvars[h].ansible_host }}"{% if not loop.last %}, {% endif %}{% endfor %}]
-    retry_max      = 3
-    retry_interval = "15s"
-  }
+    server_join {
+        retry_join     = [{% for h in groups['linode'] if hostvars[h].is_nomad_server == true %}"{{ hostvars[h].ansible_host }}"{% if not loop.last %}, {% endif %}{% endfor %}]
+        retry_max      = 3
+        retry_interval = "15s"
+    }
 {% else %}
-  server_join {
-    retry_join     = [{% for h in groups['lan'] if hostvars[h].is_nomad_server == true %}"{{ hostvars[h].ansible_host }}"{% if not loop.last %}, {% endif %}{% endfor %}]
-    retry_max      = 3
-    retry_interval = "15s"
-  }
+    servers = ["{{ rpi1_ip_address }}", "{{ rpi2_ip_address }}", "{{ rpi3_ip_address }}"]
+    server_join {
+        retry_join     = ["{{ rpi1_ip_address }}", "{{ rpi2_ip_address }}", "{{ rpi3_ip_address }}"]
+        retry_max      = 3
+        retry_interval = "15s"
+    }
 {% endif %}
 {% endif %}
 
-  meta {
-      # These are variables that can be used in Nomad job files
-      PUID             = "{{ ansible_user_uid }}"
-      PGID             = "{{ ansible_user_gid }}"
-      nfsStorageRoot   = "{{ interpolated_nfs_service_storage }}"
-      localStorageRoot = "{{ interpolated_localfs_service_storage }}"
-      {% if 'macs' in group_names %}
-      restoreCommand    = "/usr/local/bin/service_restore"
-      restoreCommand1   = "--verbose"
-      restoreCommand2   = "--job"
-      restoreCommand3   = ""
-      backupCommand     = "/usr/local/bin/service_backups"
-      backupCommandArg1 = "--verbose"
-      backupCommandArg2 = "--loglevel=INFO"
-      backupCommandArg3 = ""
-      backupAllocArg1   = "--verbose"
-      backupAllocArg2   = "--loglevel=INFO"
-      backupAllocArg3   = "--allocation"
-      backupAllocArg4   = "--delete"
-      backupAllocArg5   = "--job"
-      backupAllocArg6   = ""
-      {% else %}
-      restoreCommand    = "sudo"
-      restoreCommand1   = "/usr/local/bin/service_restore"
-      restoreCommand2   = "--job"
-      restoreCommand3   = "--verbose"
-      backupCommand     = "sudo"
-      backupCommandArg1 = "/usr/local/bin/service_backups"
-      backupCommandArg2 = "--verbose"
-      backupCommandArg3 = "--loglevel=INFO"
-      backupAllocArg1   = "/usr/local/bin/service_backups"
-      backupAllocArg2   = "--verbose"
-      backupAllocArg3   = "--loglevel=INFO"
-      backupAllocArg4   = "--allocation"
-      backupAllocArg5   = "--job"
-      backupAllocArg6   = "--delete"
-      {% endif %}
-  }
+    meta {
+        # These are variables that can be used in Nomad job files
+        PUID             = "{{ ansible_user_uid }}"
+        PGID             = "{{ ansible_user_gid }}"
+        nfsStorageRoot   = "{{ interpolated_nfs_service_storage }}"
+        localStorageRoot = "{{ interpolated_localfs_service_storage }}"
+        {% if 'macs' in group_names %}
+        restoreCommand    = "/usr/local/bin/service_restore"
+        restoreCommand1   = "--verbose"
+        restoreCommand2   = "--job"
+        restoreCommand3   = ""
+        backupCommand     = "/usr/local/bin/service_backups"
+        backupCommandArg1 = "--verbose"
+        backupCommandArg2 = "--loglevel=INFO"
+        backupCommandArg3 = ""
+        backupAllocArg1   = "--verbose"
+        backupAllocArg2   = "--loglevel=INFO"
+        backupAllocArg3   = "--allocation"
+        backupAllocArg4   = "--delete"
+        backupAllocArg5   = "--job"
+        backupAllocArg6   = ""
+        {% else %}
+        restoreCommand    = "sudo"
+        restoreCommand1   = "/usr/local/bin/service_restore"
+        restoreCommand2   = "--job"
+        restoreCommand3   = "--verbose"
+        backupCommand     = "sudo"
+        backupCommandArg1 = "/usr/local/bin/service_backups"
+        backupCommandArg2 = "--verbose"
+        backupCommandArg3 = "--loglevel=INFO"
+        backupAllocArg1   = "/usr/local/bin/service_backups"
+        backupAllocArg2   = "--verbose"
+        backupAllocArg3   = "--loglevel=INFO"
+        backupAllocArg4   = "--allocation"
+        backupAllocArg5   = "--job"
+        backupAllocArg6   = "--delete"
+        {% endif %}
+    }
 
 } # /client
 
 {% if is_nomad_server %}
 # ----------------------------------------- Server Config
 server {
-  enabled               = true
-  encrypt               = "{{ nomad_encryption_key }}"
+    enabled               = true
+    encrypt               = "{{ nomad_encryption_key }}"
 {% if 'linode' in group_names %}
-  bootstrap_expect      = 1
+    bootstrap_expect      = 1
 {% else %}
-  bootstrap_expect      = 3
+    bootstrap_expect      = 3
 {% endif %}
-  node_gc_threshold     = "15m"
-  job_gc_interval       = "15m"
-  job_gc_threshold      = "6h"
-  heartbeat_grace       = "60s"
-  min_heartbeat_ttl     = "20s"
-  raft_protocol         = "3"
+    node_gc_threshold     = "15m"
+    job_gc_interval       = "15m"
+    job_gc_threshold      = "6h"
+    heartbeat_grace       = "60s"
+    min_heartbeat_ttl     = "20s"
+    raft_protocol         = "3"
 
-  server_join {
-    retry_join      = [{% for h in groups['lan'] if hostvars[h].is_nomad_server == true %}"{{ hostvars[h].ansible_host }}"{% if not loop.last %}, {% endif %}{% endfor %}]
-    retry_max       = 3
-    retry_interval  = "15s"
-  }
+    server_join {
+        retry_join      = ["{{ rpi1_ip_address }}", "{{ rpi2_ip_address }}", "{{ rpi3_ip_address }}"]
+        retry_max       = 3
+        retry_interval  = "15s"
+    }
 }
 
 autopilot {
-  cleanup_dead_servers      = true
-  last_contact_threshold    = "200ms"
-  max_trailing_logs         = 250
-  server_stabilization_time = "10s"
-  enable_redundancy_zones   = false
-  disable_upgrade_migration = false
-  enable_custom_upgrades    = false
+    cleanup_dead_servers      = true
+    disable_upgrade_migration = false
+    enable_custom_upgrades    = false
+    enable_redundancy_zones   = false
+    last_contact_threshold    = "200ms"
+    max_trailing_logs         = 250
+    server_stabilization_time = "10s"
 }
 
 {% endif %}
 
 {% if is_nomad_server and is_nomad_client %}
 client {
-  enabled = true
+    enabled = true
 }
 {% endif %}
 
 # ----------------------------------------- Telemety
 telemetry = {
-  publish_allocation_metrics  = true
-  publish_node_metrics        = true
-  collection_interval         = "10s"
-  filter_default              = false
-  datadog_address             = "localhost:8125"
-  prefix_filter               = [
-    "+nomad.client.allocations.running",
-    "+nomad.client.allocations.terminal",
-    "+nomad.client.allocs.cpu.allocated",
-    "+nomad.client.allocs.cpu.total_percent",
-    "+nomad.client.allocs.memory.allocated",
-    "+nomad.client.allocs.memory.swap",
-    "+nomad.client.allocs.memory.usage",
-    "+nomad.nomad.job_status.dead",
-    "+nomad.nomad.job_status.running",
-    "+nomad.nomad.job_status.pending",
-    "+nomad.nomad.job_summary.running",
-    "+nomad.nomad.job_summary.complete",
-    "+nomad.nomad.job_summary.lost",
-    "+nomad.nomad.job_summary.failed"]
+    collection_interval         = "10s"
+    datadog_address             = "localhost:8125"
+    filter_default              = false
+    publish_allocation_metrics  = true
+    publish_node_metrics        = true
+    prefix_filter               = [
+        "+nomad.client.allocations.running",
+        "+nomad.client.allocations.terminal",
+        "+nomad.client.allocs.cpu.allocated",
+        "+nomad.client.allocs.cpu.total_percent",
+        "+nomad.client.allocs.memory.allocated",
+        "+nomad.client.allocs.memory.swap",
+        "+nomad.client.allocs.memory.usage",
+        "+nomad.nomad.job_status.dead",
+        "+nomad.nomad.job_status.running",
+        "+nomad.nomad.job_status.pending",
+        "+nomad.nomad.job_summary.running",
+        "+nomad.nomad.job_summary.complete",
+        "+nomad.nomad.job_summary.lost",
+        "+nomad.nomad.job_summary.failed"
+        ]
 }
 
 # ----------------------------------------- Plugins
 plugin "raw_exec" {
-  config {
-    enabled = true
-  }
+    config {
+        enabled = true
+    }
 }
 
 plugin "docker" {
   config {
-    allow_caps       = ["all"]
-    allow_privileged = true
-    extra_labels = ["job_name"]
-    volumes {
-      enabled = true
-    }
-
+        allow_caps       = ["all"]
+        allow_privileged = true
+        extra_labels     = ["job_name", "job_id", "task_group_name", "task_name", "namespace", "node_name", "node_id"]
+        volumes {
+            enabled = true
+        }
   }
 }
