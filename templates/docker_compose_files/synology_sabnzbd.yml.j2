@@ -10,13 +10,15 @@ services:
       - "TZ=America/New_York"
       - "PGID=101"
       - "PUID={{ ansible_user_uid }}"
+      - "DOCKER_MODS=linuxserver/mods:universal-cron"
     volumes:
       - /var/services/homes/{{ my_username }}:/{{ my_username }}
       - /volume1/nate:/nate
       - /volume1/media/downloads/nzb:/nzbd
       - /volume1/media/downloads/temp:/incomplete-downloads
       - /volume1/media/downloads/complete:/downloads
-      - /volume1/docker/sabnzbd:/config
+      - /volume1/pi-cluster/sabnzbd:/config
+      - /volume1/pi-cluster/sabnzbd/startup-scripts:/custom-cont-init.d
     ports:
       - 8080:8080
       - 9090:9090

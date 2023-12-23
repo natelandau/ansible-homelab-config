@@ -89,8 +89,8 @@ job "jellyfin" {
             } // service
 
             resources {
-                cpu    = 5000 # MHz
-                memory = 1000 # MB
+                cpu    = 2500 # MHz
+                memory = 700 # MB
             } // resources
 
         } // task

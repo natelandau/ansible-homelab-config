@@ -114,7 +114,7 @@ job "valentina" {
 
             driver = "docker"
             config {
-                image              = "ghcr.io/natelandau/backup-mongodb:{{ backup_mongodb_version }}"
+                image              = "ghcr.io/natelandau/backup-mongodb:v{{ backup_mongodb_version }}"
                 image_pull_timeout = "10m"
                 hostname           = "${NOMAD_TASK_NAME}"
                 ports              = ["port1"]

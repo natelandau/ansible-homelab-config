@@ -278,7 +278,7 @@ job "reverse-proxy" {
 
           driver = "docker"
           config {
-              image    = "traefik:{{ traefik_version }}"
+              image    = "traefik:v{{ traefik_version }}"
               hostname = "traefik"
               ports    = ["dashboard", "web", "websecure","externalwebsecure"]
               volumes  = [ "${meta.nfsStorageRoot}/pi-cluster/traefik/acme:/acme" ]

@@ -5,13 +5,13 @@ consul_version: 1.16.1
 influxdb_version: 1.11.1
 nomad_version: 1.7.1
 prometheus_verssion: 2.46.0
-recyclarr_version: 5.3.1
+recyclarr_version: 6.0.2
 speedtest_cli_version: 1.2.0
 tdarr_installer_version: 2.00.13
 telegraf_version: 1.28.4
-traefik_version: "v2.10.7"
+traefik_version: 2.10.7
 valentina_version: 2.1.0
-backup_mongodb_version: "v1.0.0"
+backup_mongodb_version: 1.1.0
 
 # ---------------------------------- SERVICE STATIC PORT MAPPINGS
 authelia_port: "9091"

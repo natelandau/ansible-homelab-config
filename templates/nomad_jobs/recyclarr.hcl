@@ -107,7 +107,6 @@ sonarr:
 # Configuration specific to Radarr.
 radarr:
     movies:
-        # Set the URL/API Key to your actual instance
         base_url: https://radarr.{{ homelab_domain_name }}/
         api_key: {{ radarr_api_key }}
         delete_old_custom_formats: true
@@ -120,9 +119,11 @@ radarr:
 
         quality_profiles:
             - name: "720p/1080p"
-              reset_unmatched_scores: true
+              reset_unmatched_scores:
+                enabled: true
             - name: "720p/1080p Remux"
-              reset_unmatched_scores: true
+              reset_unmatched_scores:
+                enabled: true
 
         custom_formats:
             # Use `recyclarr list custom-formats radarr` for values you can put here.

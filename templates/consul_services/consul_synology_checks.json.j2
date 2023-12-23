@@ -9,8 +9,7 @@
               "traefik.http.routers.sabnzbd.entryPoints=web,websecure",
               "traefik.http.routers.sabnzbd.service=sabnzbd",
               "traefik.http.routers.sabnzbd.tls=true",
-              "traefik.http.routers.sabnzbd.tls.certresolver=cloudflare",
-              "traefik.http.routers.sabnzbd.middlewares=authelia@file"
+              "traefik.http.routers.sabnzbd.tls.certresolver=cloudflare"
               ],
             "checks": [{
                 "id": "sabnzbd-http-check",

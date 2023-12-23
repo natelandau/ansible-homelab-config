@@ -40,6 +40,7 @@ job "stash" {
       env {
           PUID                = "${meta.PUID}"
           PGID                = "${meta.PGID}"
+          TZ                  = "America/New_York"
           STASH_STASH         = "/data/"
           STASH_GENERATED     = "/generated/"
           STASH_METADATA      = "/metadata/"
@@ -58,6 +59,7 @@ job "stash" {
             "${meta.nfsStorageRoot}/nate/.stash/generated:/generated",
             "${meta.nfsStorageRoot}/nate/.stash/media:/data",
             "${meta.nfsStorageRoot}/nate/.stash/metadata:/metadata",
+            "${meta.nfsStorageRoot}/nate/.stash/blobs:/blobs",
             "/etc/timezone:/etc/timezone:ro"
           ]
           ports = ["port1"]
@@ -90,7 +92,7 @@ job "stash" {
       } // service
 
       resources {
-          cpu    = 4500 # MHz
+          cpu    = 3000 # MHz
           memory = 400 # MB
       } // resources
 
