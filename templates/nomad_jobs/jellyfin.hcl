@@ -71,7 +71,7 @@ job "jellyfin" {
                     "traefik.http.routers.${NOMAD_TASK_NAME}.entryPoints=web,websecure",
                     "traefik.http.routers.${NOMAD_TASK_NAME}.service=${NOMAD_TASK_NAME}",
                     "traefik.http.routers.${NOMAD_TASK_NAME}.tls=true",
-                    "traefik.http.routers.${NOMAD_TASK_NAME}.tls.certresolver=cloudflare",
+                    "traefik.http.routers.${NOMAD_TASK_NAME}.tls.certresolver=cloudflare"
                 ]
 
                 check {
@@ -90,7 +90,7 @@ job "jellyfin" {
 
             resources {
                 cpu    = 2500 # MHz
-                memory = 700 # MB
+                memory = 750 # MB
             } // resources
 
         } // task

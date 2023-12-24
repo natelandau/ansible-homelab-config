@@ -45,7 +45,8 @@ job "valentina" {
                 VALENTINA_OWNER_CHANNELS        = "{{ valentina_owner_channels }}"
                 VALENTINA_OWNER_IDS             = "{{ valentina_owner_ids }}"
                 VALENTINA_S3_BUCKET_NAME        = "{{ valentina_s3_bucket_name}}"
-                VALENTINA_DB_PATH               = "/valentina/valentina.sqlite" # Depreciated
+                VALENTINA_GITHUB_TOKEN          = "{{ valentina_github_token }}"
+                VALENTINA_GITHUB_REPO           = "{{ valentina_github_repo }}"
             }
             driver = "docker"
             config {

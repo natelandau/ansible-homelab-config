@@ -14,7 +14,6 @@ valentina_version: 2.1.0
 backup_mongodb_version: 1.1.0
 
 # ---------------------------------- SERVICE STATIC PORT MAPPINGS
-authelia_port: "9091"
 influxdb_port: "8086"
 tdarr_node_port: "8267"
 tdarr_server_port: "8266"

@@ -51,7 +51,7 @@ job "promtail-syslogs" {
 
           {% raw -%}
           clients:
-            - url: http://{{ range service "loki" }}{{ .Address }}:{{ .Port }}{{ end }}/loki/api/v1/push
+            - url: http://{{ range nomadService "loki" }}{{ .Address }}:{{ .Port }}{{ end }}/loki/api/v1/push
           {% endraw %}
 
           scrape_configs:

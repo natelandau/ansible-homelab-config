@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+    jellyfin:
+        image: lscr.io/linuxserver/jellyfin:latest
+        hostname: jellyfin
+        container_name: jellyfin
+        network_mode: "host"
+        environment:
+            - "TZ=America/New_York"
+            - "PGID=101"
+            - "PUID={{ ansible_user_uid }}"
+        volumes:
+            - /volume1/pi-cluster/jellyfin:/config
+            - /volume1/media/media/movies:/data/movies
+            - /volume1/media/media/tv:/data/tv
+        restart: unless-stopped

@@ -76,7 +76,6 @@ job "stash" {
               "traefik.http.routers.${NOMAD_JOB_NAME}.service=${NOMAD_JOB_NAME}",
               "traefik.http.routers.${NOMAD_JOB_NAME}.tls=true",
               "traefik.http.routers.${NOMAD_JOB_NAME}.tls.certresolver=cloudflare",
-            //   "traefik.http.routers.${NOMAD_JOB_NAME}.middlewares=authelia@file"
             ]
 
           check {
