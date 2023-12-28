@@ -248,6 +248,10 @@ job "reverse-proxy" {
                 static = 4430
                 to     = 4430
             }
+            port "ssh" { # Used for gitea
+                static = 2222
+                to     = 2222
+            }
         }
 
         task "whoami" {
@@ -305,12 +309,13 @@ job "reverse-proxy" {
             config {
                 image              = "traefik:v{{ traefik_version }}"
                 hostname           = "traefik"
-                ports              = ["dashboard", "web", "websecure","externalwebsecure"]
+                ports              = ["dashboard", "web", "websecure","externalwebsecure", "ssh"]
                 volumes            = [ "${meta.nfsStorageRoot}/pi-cluster/traefik/acme:/acme" ]
                 image_pull_timeout = "10m"
                 args     = [
                     "--global.sendAnonymousUsage=false",
                     "--global.checkNewVersion=false",
+                    "--entryPoints.gitea-ssh.address=:2222",
                     "--entryPoints.web.address=:80",
                     "--entryPoints.websecure.address=:443",
                     "--entryPoints.externalwebsecure.address=:4430",
@@ -449,8 +454,8 @@ job "reverse-proxy" {
             } // service
 
             resources {
-                //cpu    = 40 # MHz
-                memory = 64 # MB
+                cpu    = 140 # MHz
+                memory = 100 # MB
             } // resources
 
         } // task traefik

@@ -1,7 +1,9 @@
 ---
 # ---------------------------------- SOFTWARE VERSIONS
 authelia_version: 4.37.5
+backup_mongodb_version: 1.1.0
 consul_version: 1.16.1
+gitea_version: 1.21.3
 influxdb_version: 1.11.1
 nomad_version: 1.7.1
 prometheus_verssion: 2.46.0
@@ -11,7 +13,6 @@ tdarr_installer_version: 2.00.13
 telegraf_version: 1.28.4
 traefik_version: 2.10.7
 valentina_version: 2.1.0
-backup_mongodb_version: 1.1.0
 
 # ---------------------------------- SERVICE STATIC PORT MAPPINGS
 influxdb_port: "8086"
@@ -22,6 +23,7 @@ tdarr_webui_port: "8265"
 # ---------------------------------- DIRECTORIES FOR SERVICE LOCAL STORAGE
 # These folders must be created, even if empty, to allow mounting nomad local storage end-points
 service_localfs_dirs:
+    - gitea
     - influxdb
     - lidarr
     - prowlarr

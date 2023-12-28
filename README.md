@@ -41,14 +41,13 @@ This playbook adds storage, services, applications, and configurations to a prev
     -   Custom shell scripts for backups and house keeping
 
 *   **Syncs Nomad and Docker Compose job files** to servers:
-    -   [ASN-to-IP](https://hub.docker.com/r/ddimick/asn-to-ip) - Used by Opnsense to build firewall aliases
     -   [Authelia](https://www.authelia.com/) - Open-source full-featured authentication server
     -   [Changedetection.io](https://github.com/dgtlmoon/changedetection.io) - Website change detection monitoring and notification service
     -   [Diun](https://crazymax.dev/diun/) - Docker Image Update Notifier is a CLI application
     -   [FreshRSS](https://freshrss.org/) - A containerized RSS reader
+    -   [Gitea](https://about.gitea.com/) - Slef-hodted Git service
     -   [Grafana](https://grafana.com/) - Operational dashboards
     -   [Grafana Loki](https://grafana.com/oss/loki/) - Log aggregation system
-    -   [Headless Trunk](https://github.com/alpeware/chrome-headless-trunk) - Headless Chromium
     -   [iCloud Drive Docker](https://github.com/mandarons/icloud-drive-docker) - Backup files and photos from Apple iCloud
     -   [InfluxDB](https://www.influxdata.com/) - Time series database
     -   [Lidarr](https://lidarr.audio/) - Music collection manager
