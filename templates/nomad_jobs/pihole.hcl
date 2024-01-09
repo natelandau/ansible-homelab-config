@@ -137,6 +137,7 @@ job "pihole" {
       service {
         name = "piholeDNStcp"
         port = "dns"
+        provider = "nomad"
         check {
           type     = "tcp"
           port     = "dns"

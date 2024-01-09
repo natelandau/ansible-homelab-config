@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   sabnzbd:
-    image: ghcr.io/linuxserver/sabnzbd
+    image: ghcr.io/linuxserver/sabnzbd:{{ sabnzbd_version }}
     hostname: sabnzbd
     container_name: sabnzbd
     network_mode: "bridge"
@@ -10,7 +10,7 @@ services:
       - "TZ=America/New_York"
       - "PGID=101"
       - "PUID={{ ansible_user_uid }}"
-      - "DOCKER_MODS=linuxserver/mods:universal-cron"
+      #- "DOCKER_MODS=linuxserver/mods:universal-cron"
     volumes:
       - /var/services/homes/{{ my_username }}:/{{ my_username }}
       - /volume1/nate:/nate
