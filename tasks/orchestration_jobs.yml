@@ -74,3 +74,15 @@
             dest: "{{ docker_compose_file_location }}/{{ item | basename | regex_replace('.j2$', '') }}"
             mode: 0644
         with_fileglob: "../templates/docker_compose_files/*.j2"
+
+- name: "Prune docker caches"
+  community.docker.docker_prune:
+      containers: true
+      images: true
+      images_filters:
+          dangling: false
+      networks: true
+      volumes: true
+      builder_cache: true
+  when:
+      - is_docker_compose_client or is_nomad_client or is_nomad_server
