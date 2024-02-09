@@ -70,45 +70,136 @@ job "recyclarr" {
 sonarr:
     series:
         base_url: https://sonarr.{{ homelab_domain_name }}/
-        api_key: {{ sonarr_api_key }}
+        api_key: "{{ sonarr_api_key }}"
         delete_old_custom_formats: true
+        replace_existing_custom_formats: true
 
         # Quality definitions from the guide to sync to Sonarr. Choices: series, anime
         quality_definition:
             type: series
 
-        # Release profiles from the guide to sync to Sonarr v3 (Sonarr v4 does not use this!)
-        # Use `recyclarr list release-profiles` for values you can put here.
-        # https://trash-guides.info/Sonarr/Sonarr-Release-Profile-RegEx/
-        release_profiles:
+        quality_profiles:
+            - name: "HD - 720p/1080p"
+              reset_unmatched_scores:
+                  enabled: true
+              upgrade:
+                  allowed: true
+                  until_quality: WEB-1080p
+              qualities:
+                  - name: Bluray-2160p Remux
+                    enabled: false
+                  - name: Bluray-2160p
+                    enabled: false
+                  - name: WEB-2160p
+                    enabled: false
+                    qualities:
+                        - WEBRip-2160p
+                        - WEBDL-2160p
+                  - name: HDTV-2160p
+                    enabled: false
+                  - name: Bluray-1080p Remux
+                    enabled: false
+                  - name: Bluray-1080p
+                  - name: WEB-1080p
+                    qualities:
+                        - WEBRip-1080p
+                        - WEBDL-1080p
+                  - name: HDTV-1080p
+                  - name: Bluray-720p
+                    enabled: false
+                  - name: WEB-720
+                    qualities:
+                        - WEBRip-720p
+                        - WEBDL-720p
+                  - name: HDTV-720p
+        custom_formats:
             - trash_ids:
-                  - EBC725268D687D588A20CBC5F97E538B # Low Quality Groups
-                  - 1B018E0C53EC825085DD911102E2CA36 # Release Sources (Streaming Service)
-                  - 71899E6C303A07AF0E4746EFF9873532 # P2P Groups + Repack/Proper
-              strict_negative_scores: false
-
+                  - 85c61753df5da1fb2aab6f2a47426b09 # BR-DISK
+                  - 9c11cd3f07101cdba90a2d81cf0e56b4 # LQ
+                  - e2315f990da2e2cbfc9fa5b7a6fcfe48 # LQ Release Title
+                  #   - 47435ece6b99a0b477caf360e79ba0bb # X265
+                  - fbcb31d8dabd2a319072b84fc0b7249c # Extras
+                  - 32b367365729d530ca1c124a0b180c64 # Bad dual lingual groups
+                  - 82d40da2bc6923f41e14394075dd4b03 # No-RlsGroup
+              quality_profiles:
+                  - name: "HD - 720p/1080p"
+                    score: -1000
             - trash_ids:
-                  - 76e060895c5b8a765c310933da0a5357 # Optionals
-              filter:
-                  include:
-                      - cec8880b847dd5d31d29167ee0112b57 # Golden rule
-                      - 436f5a7d08fbf02ba25cb5e5dfe98e55 # Ignore Dolby Vision without HDR10 fallback.
-                      #   - f3f0f3691c6a1988d4a02963e69d11f2 # Ignore The Group -SCENE
-                      #   - 5bc23c3a055a1a5d8bbe4fb49d80e0cb # Ignore so called scene releases
-                      - 538bad00ee6f8aced8e0db5218b8484c # Ignore Bad Dual Audio Groups
-                      - 4861d8238f9234606df6721df6e27deb # Ignore AV1
-                      - bc7a6383cbe88c3ee2d6396e1aacc0b3 # Prefer HDR
-                      - 6f2aefa61342a63387f2a90489e90790 # Dislike retags: rartv, rarbg, eztv, TGx
-                      - 19cd5ecc0a24bf493a75e80a51974cdd # Dislike retagged groups
-                      - 6a7b462c6caee4a991a9d8aa38ce2405 # Dislike release ending: en
-                      - 236a3626a07cacf5692c73cc947bc280 # Dislike release containing: 1-
-                      #   - fa47da3377076d82d07c4e95b3f13d07 # Prefer Dolby Vision
+                  - ec8fa7296b64e8cd390a1600981f3923 # Repack
+              quality_profiles:
+                  - name: "HD - 720p/1080p"
+                    score: 5
+            - trash_ids:
+                  - eb3d5cc0a2be0db205fb823640db6a3c # Repack2
+              quality_profiles:
+                  - name: "HD - 720p/1080p"
+                    score: 6
+            - trash_ids:
+                  - 44e7c4de10ae50265753082e5dc76047 # Repack3
+              quality_profiles:
+                  - name: "HD - 720p/1080p"
+                    score: 7
+            - trash_ids: # Streaming services, Low Tier
+                  - bbcaf03147de0f73be2be4a9078dfa03 # 40D
+                  - fcc09418f67ccaddcf3b641a22c5cfd7 # ALL4
+                  - 77a7b25585c18af08f60b1547bb9b4fb # CC
+                  - f27d46a831e6b16fa3fee2c4e5d10984 # CANALPlus
+                  - 4e9a630db98d5391aec1368a0256e2fe # CRAV
+                  - 36b72f59f4ea20aad9316f475f2d9fbb # DCU
+                  - 7be9c0572d8cd4f81785dacf7e85985e # FOD
+                  - 7a235133c87f7da4c8cccceca7e3c7a6 # HBO
+                  - f6cce30f1733d5c8194222a7507909bb # HULU
+                  - dc503e2425126fa1d0a9ad6168c83b3f # IP
+                  - 0ac24a2a68a9700bcb7eeca8e5cd644c # iT
+                  - b2b980877494b560443631eb1f473867 # NLZ
+                  - fb1a91cdc0f26f7ca0696e0e95274645 # OViD
+                  - c30d2958827d1867c73318a5a2957eb1 # Red
+                  - ae58039e1319178e6be73caab5c42166 # Sho
+                  - d100ea972d1af2150b65b1cffb80f6b5 # TVer
+                  - 0e99e7cc719a8a73b2668c3a0c3fe10c # U-next
+                  - 5d2317d99af813b6529c7ebf01c83533 # VDL
+              quality_profiles:
+                  - name: "HD - 720p/1080p"
+                    score: 50
+            - trash_ids: # Streaming services, second tier
+                  - d660701077794679fd59e8bdf4ce3a29 # AMZN
+                  - a880d6abc21e7c16884f3ae393f84179 # HMAX
+                  - d34870697c9db575f17700212167be23 # NF
+                  - 1656adc6d7bb2c8cca6acfb6592db421 # PCOK
+                  - c67a75ae4a1715f2bb4d492755ba4195 # PMTP
+                  - 3ac5d84fce98bab1b531393e9c82f467 # QIBI
+                  - 1efe8da11bfd74fbbcd4d8117ddb9213 # STAN
+              quality_profiles:
+                  - name: "HD - 720p/1080p"
+                    score: 80
+            - trash_ids: # Streaming services, Top tier
+                  - f67c9ca88f463a48346062e8ad07713f # ATVP
+                  - 89358767a60cc28783cdc3d0be9388a4 # DSNP
+                  - 81d1fbf600e2540cee87f3a23f9d3c1c # MAX
+              quality_profiles:
+                  - name: "HD - 720p/1080p"
+                    score: 100
+            - trash_ids: # HQ Source Groups: Tier 1
+                  - e6258996055b9fbab7e9cb2f75819294
+              quality_profiles:
+                  - name: "HD - 720p/1080p"
+                    score: 1700
+            - trash_ids: # HQ Source Groups: Tier 2
+                  - 58790d4e2fdcd9733aa7ae68ba2bb503
+              quality_profiles:
+                  - name: "HD - 720p/1080p"
+                    score: 1650
+            - trash_ids: # HQ Source Groups: Tier 3
+                  - d84935abd3f8556dcd51d4f27e22d0a6
+              quality_profiles:
+                  - name: "HD - 720p/1080p"
+                    score: 1600
 
 # Configuration specific to Radarr.
 radarr:
     movies:
         base_url: https://radarr.{{ homelab_domain_name }}/
-        api_key: {{ radarr_api_key }}
+        api_key: "{{ radarr_api_key }}"
         delete_old_custom_formats: true
         replace_existing_custom_formats: true
 
@@ -120,10 +211,10 @@ radarr:
         quality_profiles:
             - name: "720p/1080p"
               reset_unmatched_scores:
-                enabled: true
+                  enabled: true
             - name: "720p/1080p Remux"
               reset_unmatched_scores:
-                enabled: true
+                  enabled: true
 
         custom_formats:
             # Use `recyclarr list custom-formats radarr` for values you can put here.
@@ -201,6 +292,7 @@ radarr:
                     score: 80
                   - name: "720p/1080p Remux"
                     score: 80
+
               EOH
       }
 

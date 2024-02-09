@@ -40,6 +40,7 @@ job "valentina" {
                 VALENTINA_GUILDS                = "{{ valentina_guids }}"
                 VALENTINA_LOG_LEVEL             = "INFO"
                 VALENTINA_LOG_LEVEL_AWS         = "INFO"
+                VALENTINA_LOG_LEVEL_HTTP        = "ERROR"
                 VALENTINA_MONGO_DATABASE_NAME   = "{{ valentina_mongo_database_name }}"
                 VALENTINA_MONGO_URI             = "{{ valentina_mongo_uri }}"
                 VALENTINA_OWNER_CHANNELS        = "{{ valentina_owner_channels }}"

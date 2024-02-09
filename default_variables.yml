@@ -12,7 +12,7 @@ speedtest_cli_version: 1.2.0
 tdarr_installer_version: 2.00.13
 telegraf_version: 1.28.4
 traefik_version: 2.10.7
-valentina_version: 2.1.0
+valentina_version: 2.2.0
 sabnzbd_version: 4.2.1
 
 # ---------------------------------- SERVICE STATIC PORT MAPPINGS
