@@ -275,9 +275,9 @@ radarr:
                   - f2aacebe2c932337fe352fa6e42c1611 # 9.1 Surround
               quality_profiles:
                   - name: "720p/1080p"
-                    score: -50
+                    score: -100
                   - name: "720p/1080p Remux"
-                    score: -50
+                    score: -100
 
             - trash_ids:
                   - 89dac1be53d5268a7e10a19d3c896826 # 2.0 Stereo

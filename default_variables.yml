@@ -3,17 +3,17 @@
 authelia_version: 4.37.5
 backup_mongodb_version: 1.1.0
 consul_version: 1.16.1
-gitea_version: 1.21.3
+gitea_version: 1.21.6
 influxdb_version: 1.11.1
-nomad_version: 1.7.1
+nomad_version: 1.7.5
 prometheus_verssion: 2.46.0
 recyclarr_version: 6.0.2
 speedtest_cli_version: 1.2.0
 tdarr_installer_version: 2.00.13
-telegraf_version: 1.28.4
+telegraf_version: 1.29.5
 traefik_version: 2.10.7
-valentina_version: 2.2.0
-sabnzbd_version: 4.2.1
+valentina_version: 2.2.1
+sabnzbd_version: 4.2.2
 
 # ---------------------------------- SERVICE STATIC PORT MAPPINGS
 influxdb_port: "8086"

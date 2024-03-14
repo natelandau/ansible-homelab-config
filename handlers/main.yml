@@ -53,13 +53,13 @@
 
 - name: Restart nomad (Debian)
   become: true
-  ansible.builtin.systemd:
+  ansible.builtin.systemd_service:
       name: nomad
       enabled: true
       state: restarted
   register: nomad_service
-  failed_when: nomad_service.rc > 0
-  changed_when: nomad_service.rc == 0
+  # failed_when: nomad_service.Result != "success"
+  # changed_when: nomad_service.Result == "success"
   when:
       - ansible_os_family == 'Debian'
       - "'nostart' not in ansible_run_tags"

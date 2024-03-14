@@ -87,10 +87,10 @@ job "hishtory" {
 
             } // service
 
-            // resources {
-            //     cpu    = 100 # MHz
-            //     memory = 300 # MB
-            // } // resources
+            resources {
+                cpu    = 1800 # MHz
+                memory = 800 # MB
+            } // resources
 
         } // task
 
