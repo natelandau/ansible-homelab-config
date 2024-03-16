@@ -12,21 +12,21 @@ exclude_paths:
     - vault.yml
     - .venv/
     - ansible_collections/
-
 skip_list:
-    - name[template]
-    - ignore-errors
-    - meta-incorrect
-    - meta-no-info
-    - package-latest
-    - role-name
-    - unnamed-task
-    - var-naming
-    - latest[git]
+    - yaml[indentation]
+#     - name[template]
+#     - ignore-errors
+#     - meta-incorrect
+#     - meta-no-info
+#     - package-latest
+#     - role-name
+#     - unnamed-task
+#     - var-naming
+#     - latest[git]
 
-warn_list:
-    - experimental
-    - risky-file-permissions
-    - command-instead-of-module
-    - no-changed-when
-    - command-instead-of-shell
+# warn_list:
+#     - experimental
+#     - risky-file-permissions
+#     - command-instead-of-module
+#     - no-changed-when
+#     - command-instead-of-shell

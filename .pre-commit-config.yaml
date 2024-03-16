@@ -1,7 +1,7 @@
 ---
 repos:
     - repo: "https://github.com/commitizen-tools/commitizen"
-      rev: v3.18.3
+      rev: v3.18.4
       hooks:
           - id: "commitizen"
 
@@ -48,6 +48,16 @@ repos:
       hooks:
           - id: typos
 
+    - repo: "https://github.com/ansible/ansible-lint"
+      rev: v24.2.1
+      hooks:
+          - id: ansible-lint
+            additional_dependencies:
+                - ansible
+            args:
+                - --config-file
+                - .ansible-lint.yml
+
     - repo: local
       hooks:
           - id: vault-pre-commit
@@ -63,13 +73,6 @@ repos:
             language: system
             pass_filenames: true
             types: [text]
-
-          - id: ansible-lint
-            name: running ansible-lint
-            language: system
-            files: \.(yaml|yml)$
-            pass_filenames: false
-            entry: ansible-lint --force-color --config-file .ansible-lint.yml
 
           - id: "lint-shellscript-templates"
             name: lint shellscript templates

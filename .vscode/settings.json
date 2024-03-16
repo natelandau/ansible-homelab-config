@@ -1,7 +1,4 @@
 {
-    "yaml.schemas": {
-        "https://raw.githubusercontent.com/ansible-community/schemas/main/f/ansible.json#/$defs/playbook": "file:///Users/natelandau/repos/ansible-homelab-config/main.yml"
-    },
     "files.associations": {
         "**/tasks/*.yml": "ansible",
         "**/handlers/*.yml": "ansible",

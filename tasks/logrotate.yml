@@ -4,7 +4,7 @@
 #
 # NOTE:  This task exists due to the arillso.logrotate failing completely on macOS
 
-- name: Add service_backups.log to logrotate
+- name: Add service_backups.log to logrotate # noqa: ignore-errors
   become: true
   vars:
       logrotate_applications:

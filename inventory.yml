@@ -106,7 +106,7 @@ all:
                             ansible_user: "{{ my_username }}"
                             ansible_become_pass: "{{ mac_become_pass }}"
                             ansible_ssh_private_key_file: "{{ ssh_key_location }}/macMini"
-                            ansible_python_interpreter: "/usr/local/bin/python3"
+                            ansible_python_interpreter: "/Users/natelandau/.pyenv/shims/python"
                             ansible_port: 22
                             mac_intel: true
                             is_nomad_client: true

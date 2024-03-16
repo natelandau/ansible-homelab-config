@@ -10,6 +10,7 @@
         ansible      = "^9.3.0"
         ansible-lint = { version = "^24.2.1", markers = "platform_system != 'Windows'" }
         commitizen   = "^3.18.3"
+        jmespath     = "^1.0.1"
         poethepoet   = "^0.25.0"
         pre-commit   = "^3.6.2"
         python       = "^3.11"
@@ -20,15 +21,12 @@
     build-backend = "poetry.core.masonry.api"
     requires      = ["poetry-core"]
 
-[tool.black]
-    line-length = 100
-
 [tool.commitizen]
     bump_message             = "bump(release): v$current_version → v$new_version"
     tag_format               = "v$version"
     update_changelog_on_bump = true
     version                  = "0.2.0"
-    version_files            = ["pyproject.toml:version"]
+    version_provider         = "poetry"
 
 [tool.poe.tasks]
     pb = """

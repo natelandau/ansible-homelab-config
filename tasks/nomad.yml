@@ -1,3 +1,4 @@
+# yamllint disable rule:indentation
 ---
 # TASK DESCRIPTION:
 # Downloads, installs, and configures Hashicorp Nomad.
@@ -83,7 +84,7 @@
 
 - name: "Create Nomad /opt storage"
   block:
-      - name: "Create {{ nomad_opt_dir_location }} directories"
+      - name: "Create {{ nomad_opt_dir_location }} directories" # noqa: name[template]
         become: true
         ansible.builtin.file:
             path: "{{ item }}"
@@ -102,9 +103,18 @@
             dest: "{{ item.dest }}"
             mode: 0755
         loop:
-            - { src: certs/nomad/nomad-ca.pem, dest: "{{ nomad_opt_dir_location }}/certs/nomad-ca.pem" }
-            - { src: certs/nomad/server.pem, dest: "{{ nomad_opt_dir_location }}/certs/server.pem" }
-            - { src: certs/nomad/server-key.pem, dest: "{{ nomad_opt_dir_location }}/certs/server-key.pem" }
+            - {
+                  src: certs/nomad/nomad-ca.pem,
+                  dest: "{{ nomad_opt_dir_location }}/certs/nomad-ca.pem",
+              }
+            - {
+                  src: certs/nomad/server.pem,
+                  dest: "{{ nomad_opt_dir_location }}/certs/server.pem",
+              }
+            - {
+                  src: certs/nomad/server-key.pem,
+                  dest: "{{ nomad_opt_dir_location }}/certs/server-key.pem",
+              }
         notify: "restart nomad"
         when: is_nomad_server
 
@@ -115,9 +125,18 @@
             dest: "{{ item.dest }}"
             mode: 0755
         loop:
-            - { src: certs/nomad/nomad-ca.pem, dest: "{{ nomad_opt_dir_location }}/certs/nomad-ca.pem" }
-            - { src: certs/nomad/client.pem, dest: "{{ nomad_opt_dir_location }}/certs/client.pem" }
-            - { src: certs/nomad/client-key.pem, dest: "{{ nomad_opt_dir_location }}/certs/client-key.pem" }
+            - {
+                  src: certs/nomad/nomad-ca.pem,
+                  dest: "{{ nomad_opt_dir_location }}/certs/nomad-ca.pem",
+              }
+            - {
+                  src: certs/nomad/client.pem,
+                  dest: "{{ nomad_opt_dir_location }}/certs/client.pem",
+              }
+            - {
+                  src: certs/nomad/client-key.pem,
+                  dest: "{{ nomad_opt_dir_location }}/certs/client-key.pem",
+              }
         notify: "restart nomad"
         when: is_nomad_client
 
@@ -130,7 +149,7 @@
             recurse: true
         when: ansible_os_family == 'Debian'
 
-      - name: "Set owner of files to {{ ansible_user_uid }}:{{ ansible_user_gid }} (MacOSX)"
+      - name: "Set owner of files to {{ ansible_user_uid }}:{{ ansible_user_gid }} (MacOSX)" # noqa: name[template]
         become: true
         ansible.builtin.file:
             path: "{{ nomad_opt_dir_location }}"

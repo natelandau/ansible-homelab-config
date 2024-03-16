@@ -54,7 +54,7 @@
         ansible.builtin.debug:
             msg: "{{ homebrew_output.unchanged_pkgs }}"
 
-      - name: Install homebrew casks
+      - name: Install homebrew casks # noqa: ignore-errors
         community.general.homebrew_cask:
             name: "{{ item }}"
             state: present

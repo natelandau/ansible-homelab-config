@@ -76,4 +76,5 @@
         when: is_tdarr_server or is_tdarr_node
 
   handlers:
-      - ansible.builtin.import_tasks: handlers/main.yml
+      - name: "Run handlers"
+        ansible.builtin.import_tasks: handlers/main.yml

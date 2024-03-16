@@ -1,3 +1,4 @@
+# yamllint disable rule:indentation
 ---
 # TASK DESCRIPTION:
 # Downloads, installs, and configures Hashicorp Consul.
@@ -117,7 +118,7 @@
 
 - name: "Create Consul /opt storage and copy certificates"
   block:
-      - name: "Create {{ consul_opt_dir }} directories"
+      - name: "Create {{ consul_opt_dir }} directories" # noqa: name[template]
         become: true
         ansible.builtin.file:
             path: "{{ item }}"
@@ -130,16 +131,25 @@
             - "{{ consul_opt_dir }}/plugins"
             - "{{ consul_opt_dir }}/certs"
 
-      - name: Copy certs to servers
+      - name: Copy certs to servers # noqa
         become: true
         ansible.builtin.copy:
             src: "{{ item.src }}"
             dest: "{{ item.dest }}"
             mode: 0755
         loop:
-            - { src: "certs/consul/consul-agent-ca.pem", dest: "{{ consul_opt_dir }}/certs/consul-agent-ca.pem" }
-            - { src: "certs/consul/{{ datacenter_name }}-server-consul-0.pem", dest: "{{ consul_opt_dir }}/certs/{{ datacenter_name }}-server-consul-0.pem" }
-            - { src: "certs/consul/{{ datacenter_name }}-server-consul-0-key.pem", dest: "{{ consul_opt_dir }}/certs/{{ datacenter_name }}-server-consul-0-key.pem" }
+            - {
+                  src: "certs/consul/consul-agent-ca.pem",
+                  dest: "{{ consul_opt_dir }}/certs/consul-agent-ca.pem",
+              }
+            - {
+                  src: "certs/consul/{{ datacenter_name }}-server-consul-0.pem",
+                  dest: "{{ consul_opt_dir }}/certs/{{ datacenter_name }}-server-consul-0.pem",
+              }
+            - {
+                  src: "certs/consul/{{ datacenter_name }}-server-consul-0-key.pem",
+                  dest: "{{ consul_opt_dir }}/certs/{{ datacenter_name }}-server-consul-0-key.pem",
+              }
         when:
             - is_consul_server
 
@@ -163,7 +173,7 @@
         when:
             - ansible_os_family == 'Debian'
 
-      - name: "Set owner of files to {{ ansible_user_uid }}:{{ ansible_user_gid }}"
+      - name: "Set owner of files to {{ ansible_user_uid }}:{{ ansible_user_gid }}" # noqa: name[template]
         become: true
         ansible.builtin.file:
             path: "{{ consul_opt_dir }}"
@@ -199,7 +209,7 @@
         when:
             - ansible_os_family == 'Debian'
 
-      - name: "Set owner of files to {{ ansible_user_uid }}:{{ ansible_user_gid }}"
+      - name: "Set owner of files to {{ ansible_user_uid }}:{{ ansible_user_gid }}" # noqa: name[template]
         become: true
         ansible.builtin.file:
             path: "{{ interpolated_consul_configuration_dir }}"
@@ -209,7 +219,7 @@
         when:
             - mac_intel or mac_arm or inventory_hostname == 'synology'
 
-      - name: "Set owner of root consul dir to {{ ansible_user_uid }}:{{ ansible_user_gid }} (synology)"
+      - name: "Set owner of root consul dir to {{ ansible_user_uid }}:{{ ansible_user_gid }} (synology)" # noqa: name[template]
         become: true
         ansible.builtin.file:
             path: /volume1/docker/consul/
@@ -328,7 +338,7 @@
             - ansible_os_family == 'Debian'
             - "'nostart' not in ansible_run_tags"
 
-      - name: Make sure Consul service is really running
+      - name: Make sure Consul service is really running # noqa: command-instead-of-module
         ansible.builtin.command:
             cmd: systemctl is-active consul
         register: is_consul_really_running
