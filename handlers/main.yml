@@ -90,9 +90,11 @@
 - name: "Ensure nomad is really running"
   ansible.builtin.shell:
       cmd: "set -o pipefail && sleep 10 && /usr/local/bin/nomad node status -self -short | grep {{ inventory_hostname }}"
+  args:
+      executable: /bin/bash
   register: node_status_response
   failed_when: node_status_response.rc > 0
-  changed_when: node_status_response.rc == 0
+  changed_when: false
   when: "'nostart' not in ansible_run_tags"
   listen: "restart nomad"
 # - name: "Ensure sure Nomad service is really running"
