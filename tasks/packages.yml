@@ -54,14 +54,14 @@
         ansible.builtin.debug:
             msg: "{{ homebrew_output.unchanged_pkgs }}"
 
-      - name: Install homebrew casks # noqa: ignore-errors
-        community.general.homebrew_cask:
-            name: "{{ item }}"
-            state: present
-            install_options: "appdir=/Applications"
-            accept_external_apps: true
-            upgrade_all: false
-            update_homebrew: false
-            greedy: false
-        loop: "{{ homebrew_casks_list }}"
-        ignore_errors: true
+      # - name: Install homebrew casks # noqa: ignore-errors
+      #   community.general.homebrew_cask:
+      #       name: "{{ item }}"
+      #       state: present
+      #       install_options: "appdir=/Applications"
+      #       accept_external_apps: true
+      #       upgrade_all: false
+      #       update_homebrew: false
+      #       greedy: false
+      #   loop: "{{ homebrew_casks_list }}"
+      #   ignore_errors: true

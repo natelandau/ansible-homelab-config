@@ -6,7 +6,7 @@ backup_mongodb_version: 1.1.0
 consul_version: 1.16.1
 gitea_version: 1.21.6
 influxdb_version: 1.11.1
-nomad_version: 1.7.5
+nomad_version: 1.7.6
 prometheus_verssion: 2.46.0
 recyclarr_version: 6.0.2
 speedtest_cli_version: 1.2.0
@@ -120,49 +120,26 @@ mac_tdarr_file_location: "/Users/{{ ansible_user }}/Library/tdarr"
 # ---------------------------------- PACKAGES
 
 apt_packages_list:
-    - bc
     - coreutils
     - curl
     - dnsutils
-    - exa
     - fzf
     - git
     - git-extras
-    - htop
-    - iftop
-    - iotop
     - iperf
-    - jq
-    - less
-    - lnav
     - logrotate
-    - lsof
     - nano
-    - netcat
-    - net-tools
-    - nmap
     - openssh-server
     - p7zip-full
     - python3-pip
-    - rsync
-    - shellcheck
     - tailscale
-    - unzip
-    - wget
-    - yamllint
-    - zsh
 
 homebrew_package_list:
-    - ansible
-    - ansible-lint
     - bash
     - bash-completion
-    - bashdb
     - bat
-    - bats-core
     - coreutils
     - diff-so-fancy
-    - exa
     - ffmpeg
     - findutils
     - fping
@@ -176,17 +153,12 @@ homebrew_package_list:
     - gnutls
     - gpg
     - grep
-    - handbrake
     - htop
-    - httpie
     - iperf
     - jq
     - nano
     - ncurses
-    - nmap
     - openssl
-    - pandoc
-    - prettier
     - readline
     - shellcheck
     - shfmt
@@ -194,11 +166,4 @@ homebrew_package_list:
     - sqlite
     - ssh-copy-id
     - tealdeer
-    - tree
     - wget
-    - yamllint
-    - zsh
-
-homebrew_cask_install_dir: /Applications
-homebrew_casks_list:
-    - lingon-x
