@@ -24,24 +24,18 @@
   when:
       - is_nomad_client or is_nomad_server
 
-- name: Ensure nomad user can run sudo with the restore script
+- name: "SUDO: Confirm users can run service_backups"
   become: true
   ansible.builtin.lineinfile:
-      path: /etc/sudoers
+      path: "/etc/sudoers.d/010_{{ item }}-backups-nopasswd"
+      line: "{{ item }} ALL=(ALL) NOPASSWD: /usr/local/bin/service_backups, /usr/local/bin/service_restore"
       state: present
-      line: "nomad ALL=(ALL) NOPASSWD: /usr/local/bin/service_backups, /usr/local/bin/service_restore"
+      create: true
+      mode: "0440"
       validate: "/usr/sbin/visudo -cf %s"
-  when:
-      - is_nomad_client or is_nomad_server
-      - "'pis' in group_names"
-
-- name: Ensure my user can run sudo with the restore script
-  become: true
-  ansible.builtin.lineinfile:
-      path: /etc/sudoers
-      state: present
-      line: "{{ ansible_user }} ALL=(ALL) NOPASSWD: /usr/local/bin/service_backups, /usr/local/bin/service_restore"
-      validate: "/usr/sbin/visudo -cf %s"
+  loop:
+      - nomad
+      - "{{ ansible_user }}"
   when:
       - is_nomad_client or is_nomad_server
       - "'pis' in group_names"
